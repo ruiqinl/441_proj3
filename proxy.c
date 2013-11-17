@@ -12,10 +12,10 @@
 
 #define BUF_SIZE 2048
 
-int main(){
+int main(int argc, char *argv[]){
 
     int listen_sock;
-    int listen_port = 8888;
+    int listen_port;// = 8888;
     struct sockaddr_in listen_addr;
     int backlog = 5;
     int sock;
@@ -23,7 +23,13 @@ int main(){
     int numbytes;
     struct sockaddr_in cli_addr;
     socklen_t cli_size;
-    
+
+    if (argc < 2) {
+	printf("Usage: ./proxy <proxy_port>\n");
+	return -1;
+    }
+
+    listen_port = atoi(argv[1]);
     
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 
