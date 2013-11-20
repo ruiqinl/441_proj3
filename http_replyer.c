@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <sys/time.h>
+#include <time.h>
 #include "http_replyer.h"
 #include "helper.h"
 
@@ -271,7 +271,7 @@ char *cont_len_str(struct buf *bufp) {
 	return str;
     }
     
-    sprintf(str, "Content-Length: %lld\r\n", status.st_size);
+    sprintf(str, "Content-Length: %ld\r\n", status.st_size);
 
     return str;
 }
