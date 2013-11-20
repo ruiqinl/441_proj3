@@ -53,6 +53,7 @@ int main(int argc, char *argv[]){
     dns_ip = argv[5];
     dns_port = atoi(argv[6]);
     www_ip = argv[7];
+    printf("www_ip %s\n", www_ip);
 
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
