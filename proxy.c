@@ -81,7 +81,11 @@ int main(int argc, char *argv[]){
     // server side of proxy: addr
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    inet_aton(www_ip, &server_addr.sin_addr);
+    if (inet_aton(www_ip, &server_addr.sin_addr) == 0) {
+	perror("Error! main, inet_aton");
+	exit(-1);
+    }
+    server_addr.sin_port = htons(8080);
     
     // server side of proxy: whatever, get f4m first
     if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
