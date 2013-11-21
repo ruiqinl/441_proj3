@@ -33,7 +33,7 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    exit(-1);
 	}
     
-	if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(server_addr)) == -1) {
+	if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(*server_addr)) == -1) {
 	    perror("Error! general_send, connect, socket2server");
 	    exit(-1);
 	}
@@ -208,6 +208,8 @@ int parse_request(struct buf *bufp) {
 	    size = bufp->rbuf_head - old_head;
 	    bufp->http_req_p->orig_req = (char *)calloc(size + 1, sizeof(char));
 	    memcpy(bufp->http_req_p->orig_req, old_head, size);
+	    
+	    bufp->http_req_p->orig_cur = bufp->http_req_p->orig_req;
 
 	} else {
 	    // only POST can reach here
