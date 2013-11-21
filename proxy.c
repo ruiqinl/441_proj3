@@ -92,11 +92,11 @@ int main(int argc, char *argv[]){
 	perror("Error! main, socket, socket2server");
 	exit(-1);
     }
-
-    /*if (connect(sock2server, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+    
+    if (connect(sock2server, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
 	perror("Error! main, connect, socket2server");
 	exit(-1);
-	}*/
+    }
     
     getf4m(sock2server);
     

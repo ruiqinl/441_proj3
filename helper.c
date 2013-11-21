@@ -489,6 +489,19 @@ void logprint(const char *log_file, const char *s) {
 
 
 int getf4m(int sock) {
-    printf("getf4m do sth\n");
+    
+    char buf[BUF_SIZE];
+    char *p = buf;
+    
+    memset(buf, 0, BUF_SIZE);
+    
+    char *req = "GET /var/www/vod/big_buck_bunny.f4m HTTP/1.1\r\n\r\n";
+    strcpy(p, req);
+    p += strlen(req);
+
+    printf("getf4m: try send\n");
+    send(sock, req, strlen(req), 0);
+    printf("getf4m: sent\n");
+
     return 0;
 }
