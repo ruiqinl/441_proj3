@@ -501,8 +501,6 @@ int *getf4m(int sock) {
     str = "GET /vod/big_buck_bunny.f4m HTTP/1.0\r\n\r\n";
     strcpy(buf, str);
 
-    printf("send\n");
-
     p = buf;
     while ((ret = send(sock, p, strlen(p), 0)) >0) 
 	p += ret;
@@ -513,7 +511,6 @@ int *getf4m(int sock) {
     }
 
     // recv reply
-    printf("recv\n");
     memset(buf, 0, BUF_SIZE);
 
     p = buf;
@@ -525,13 +522,10 @@ int *getf4m(int sock) {
 	exit(-1);
     }
     
-    printf("parse\n");
     int *res =  parsef4m(buf);
     
-    printf("pirnt\n");
-    while (res != 0)
+    while (*res != 0)
 	printf("%d  ", *(res++));
-    printf("done\n");
     
     return res;
 }
@@ -555,7 +549,6 @@ int *parsef4m(char *buf) {
 	p1 += 1;
 	*p2 = '\0';
 	rate[count++] = atoi(p1);
-	printf("???%d\n", atoi(p1));
 
 	if (count >= max_num-1) {
 	    printf("Warning! parsef4m, too many bitrate\n");
