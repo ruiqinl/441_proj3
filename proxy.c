@@ -141,6 +141,7 @@ int main(int argc, char *argv[]){
 		} else {
 		    
 		    printf("proxy: received bytes from browser/server\n");
+		    printf("?????????sock:%d, buf[%d]->status:%x\n", i, i, buf_pts[i]->status);
 
 		    // return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) {
