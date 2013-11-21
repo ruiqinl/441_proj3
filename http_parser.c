@@ -92,6 +92,8 @@ int recv_request(int sock, struct buf *bufp) {
 int parse_request(struct buf *bufp) {
     
     char *p;
+    char *old_head = NULL;
+    size_t size;
     
     p = bufp->parse_p;
     dbprintf("parse_request:\n\trbuf left to parse:\n%s\n", p);
@@ -110,6 +112,9 @@ int parse_request(struct buf *bufp) {
     while (bufp->rbuf_req_count != 0) {
 
 	dbprintf("parse_request: request count %d\n", bufp->rbuf_req_count);
+	
+	// proj3
+	old_head = bufp->rbuf_head;
 
 	// calloc http_req
 	bufp->http_req_p = (struct http_req *)calloc(1, sizeof(struct http_req));
@@ -135,10 +140,16 @@ int parse_request(struct buf *bufp) {
 
 	    // update req_queue
 	    req_enqueue(bufp->req_queue_p, bufp->http_req_p);
-
+	    
 	    // update rbuf
 	    --(bufp->rbuf_req_count);
 	    bufp->rbuf_head = strstr(bufp->rbuf_head, CRLF2) + strlen(CRLF2);
+
+	    // proj3, save origianl req
+	    size = bufp->rbuf_head - old_head;
+	    bufp->http_req_p->orig_req = (char *)calloc(size + 1, sizeof(char));
+	    memcpy(bufp->http_req_p->orig_req, old_head, size);
+	    printf("????????????%s\n", bufp->http_req_p->orig_req);
 
 	} else {
 	    // only POST can reach here
@@ -147,6 +158,7 @@ int parse_request(struct buf *bufp) {
 	}
 	
     }
+
     
     return 0;
 }
