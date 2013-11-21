@@ -56,8 +56,8 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    printf("general_send: TO_SERVER, send %ld bytes to server\n", numbytes);
 	    return 1;
 	} else if (numbytes == 0) {
-	    printf("general_send: TO_SERVER, send 0 bytes, close sock2server\n");
-	    close(sock2server);
+	    printf("general_send: TO_SERVER, send 0 bytes, do NOT close sock2server\n");
+	    //close(sock2server);
 
 	    bufp->status = FROM_SERVER; // recv from server next time
 	    return 2;
