@@ -59,7 +59,6 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 		// finish sending
 		printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2);
 
-		bufp->status = FROM_SERVER;
 		return 0;
 	    } 
 
@@ -82,22 +81,23 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	
     } else if (bufp->status == TO_BROWSER) {
 	printf("general_send: TO_BROWSER, not imp yet\n");
+	
 	return 0;
     }
 
     return 0;
 }
 
-// return 1 if fully received a request, return 0 if bytes received, 2 if partially received
+// return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 int general_recv(int sock, struct buf *bufp) {
     assert(bufp != NULL);
 
     if (bufp->status == RAW || bufp->status == FROM_BROWSER) {
 	printf("general_recv: RAW/FROM_BROWSER, call recv_BROW\n");
-	return recv_BROW(sock, bufp);// TO_SERVER is set inside recv_BROW
+	return recv_BROW(sock, bufp);
     } else if (bufp->status == FROM_SERVER) {
 	printf("general_recv: FROM_SERVER, not imp yet\n");
-	bufp->status = TO_BROWSER;
+	//bufp->status = TO_BROWSER;
 	return 1;
     }
 
@@ -111,7 +111,7 @@ int change_rate (struct buf *bufp) {
     return 0;
 }
 
-// return 1 if fully received a request, return 0 if bytes received, 2 if partially received
+// return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 int recv_BROW(int sock, struct buf *bufp){
 
     int recv_ret;
@@ -127,7 +127,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	if (bufp->req_queue_p->req_count > 0) {
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
-	    bufp->status = TO_SERVER;
+	    //bufp->status = TO_SERVER;
 
 	    // test
 	    bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";

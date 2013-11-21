@@ -142,16 +142,26 @@ int main(int argc, char *argv[]){
 		    
 		    printf("proxy: received bytes from browser/server\n");
 
+		    // return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) {
+			// whichever status, FD_CLR i
 			FD_CLR(i, &master_read_fds);
 		    } else if (recv_ret == 1) {
+			// whichever status, FD_CLR read_fds, and FD_SET write_fds
+			FD_CLR(i, &master_read_fds);
 			FD_SET(i, &master_write_fds);
+			
+			if (buf_pts[i]->status == FROM_BROWSER 
+			    || buf_pts[i]->status == RAW)
+			    buf_pts[i]->status = TO_SERVER;
+			if (buf_pts[i]->status == FROM_SERVER)
+			    buf_pts[i]->status = TO_BROWSER;
+			
 		    } else {
 			assert(recv_ret == 2);
-			// do nothing
+			// keep reading
 		    }
 
-		    //FD_CLR(i, &master_read_fds);
 		}
 	    }
 
@@ -164,7 +174,11 @@ int main(int argc, char *argv[]){
 		    FD_CLR(i, &master_write_fds);
 		    
 		    if (buf_pts[i]->status == TO_SERVER) {
+			// finished sending to server, now read from server
+			
 			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
+
+			buf_pts[buf_pts[i]->sock2server]->status == FROM_SERVER;
 
 			// keep track
 			if (buf_pts[i]->sock2server > maxfd)
