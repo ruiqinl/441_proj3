@@ -159,20 +159,17 @@ int main(int argc, char *argv[]){
 	    if (FD_ISSET(i, &write_fds)) {
 		printf("proxy: write bytes to browser/server\n");
 		
-		// return 1 if send some bytes, return 0 if finish sending, return 2 if expect reading
-		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0)
-		    FD_CLR(i, &master_write_fds);
-		else if (send_ret == 1)
-		    ; // just keep sending
-		else if (send_ret == 2) {
+		// return 1 if send some bytes, return 0 if finish sending
+		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0) {
 		    FD_CLR(i, &master_write_fds);
 		    FD_SET(buf_pts[i]->sock2server, &master_read_fds);
-		    printf("???%d > old_max\n", buf_pts[i]->sock2server, maxfd);
+		    printf("???%d > old_max %d\n", buf_pts[i]->sock2server, maxfd);
 		    // keep track
 		    if (buf_pts[i]->sock2server > maxfd)
 			maxfd = buf_pts[i]->sock2server;
 		    printf("???new max%d\n", maxfd);
-		}
+		} else if (send_ret == 1)
+		    ; // just keep sending
 		
 	    }
 	}
