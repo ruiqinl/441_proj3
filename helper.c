@@ -503,5 +503,13 @@ int getf4m(int sock) {
     send(sock, req, strlen(req), 0);
     printf("getf4m: sent\n");
 
+    memset(buf, 0, BUF_SIZE);
+    if(recv(sock, buf, BUF_SIZE, 0) < 0) {
+	printf("Error! getf4m, recv\n");
+	exit(-1);
+    }
+    
+    printf("getf4m: recv:%s\n", buf);
+
     return 0;
 }
