@@ -141,16 +141,27 @@ int main(int argc, char *argv[]){
 		    
 		    printf("proxy: received bytes from browser/server\n");
 
-		    general_recv(i, buf_pts[i]);
+		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) 
+			FD_CLR(i, &master_read_fds);
+		    else if (recv_ret == 1)
+			FD_SET(i, &master_write_fds);
+		    else {
+			assert(recv_ret == 2);
+			// do nothing
+		    }
 
-		    FD_CLR(i, &master_read_fds);
+		    //FD_CLR(i, &master_read_fds);
 		}
 	    }
 
 	    // check write_fds
 	    if (FD_ISSET(i, &write_fds)) {
-		
 		printf("proxy: write bytes to browser/server\n");
+		
+		general_send(i, buf_pts[i], server_addr);
+		
+		
+		
 	    }
 	}
 

@@ -91,6 +91,7 @@ struct http_req {
 
     // proj3
     char *orig_req;
+    char *orig_cur;
 
     struct http_req *next;
 

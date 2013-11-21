@@ -11,6 +11,64 @@
 #include "helper.h"
 #include "http_parser.h"
 
+// send to server/browser
+// return 1 if send some bytes, return 0 if finished sending
+int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
+    assert(bufp != NULL);
+    assert(server_addr != NULL);
+    
+    int sock2server;
+    size_t numbytes, bytes_sent, bytes_left;
+    char *p1, *p2;
+
+    if (bufp->status == TO_SERVER) {
+	printf("general_send: TO_SERVER\n");
+
+	dequeue_request(bufp);
+
+	// server side of proxy: whatever, get f4m first
+	if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+	    perror("Error! general_send, socket, socket2server");
+	    exit(-1);
+	}
+    
+	if (connect(sock2server, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+	    perror("Error! general_send, connect, socket2server");
+	    exit(-1);
+	}
+	
+	// left req to send
+	p1 = bufp->http_reply_p->orig_req;
+	p2 = bufp->http_reply_p->orig_cur;
+	assert(p1 != NULL); 
+	assert(p2 != NULL);
+	assert(p2 > p1);
+	
+	bytes_sent = p2 - p1;
+	bytes_left = strlen(p1);
+	assert(bytes_left == strlen(p2)); // stupid
+	if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
+	    p2 += numbytes;
+	    bufp->http_reply_p->orig_cur = p2;
+	    printf("general_send: TO_SERVER, send %ld bytes to server\n", numbytes);
+	    return 1;
+	} else if (numbytes == 0) {
+	    printf("general_send: TO_SERVER, send 0 bytes, close sock2server\n");
+	    close(sock2server);
+	    return 0;
+	} else if (numbytes == -1) {
+	    perror("Error! general_send, send\n");
+	    exit(-1);
+	}
+	
+    } else if (bufp->status == TO_BROWSER) {
+	printf("general_send: TO_BROWSER, not imp yet\n");
+	return 0;
+    }
+
+    return 0;
+}
+
 // return 1 if fully received a request, return 0 if bytes received, 2 if partially received
 int general_recv(int sock, struct buf *bufp) {
     assert(bufp != NULL);
@@ -149,7 +207,6 @@ int parse_request(struct buf *bufp) {
 	    size = bufp->rbuf_head - old_head;
 	    bufp->http_req_p->orig_req = (char *)calloc(size + 1, sizeof(char));
 	    memcpy(bufp->http_req_p->orig_req, old_head, size);
-	    printf("????????????%s\n", bufp->http_req_p->orig_req);
 
 	} else {
 	    // only POST can reach here
