@@ -57,7 +57,7 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    bufp->http_reply_p->orig_cur = p2;
 	    printf("general_send: TO_SERVER, send %ld bytes to server:\n%s\n", numbytes, p2-numbytes);
 	    return 1;*/
-	char *s = "GET / HTTP/1.1";
+	char *s = "GET / HTTP/1.1\r\n\r\n";
 	if (send(sock2server, s, strlen(s), 0) == strlen(s)) {
 	    printf("???test: send %s\n", s);
 	    bufp->status == FROM_SERVER;
