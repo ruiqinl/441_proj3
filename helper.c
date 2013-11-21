@@ -552,6 +552,7 @@ int *parsef4m(char *buf) {
 	p1 += 1;
 	*p2 = '\0';
 	rate[count++] = atoi(p1);
+	printf("???%d\n", atoi(p1));
 
 	if (count >= max_num-1) {
 	    printf("Warning! parsef4m, too many bitrate\n");
