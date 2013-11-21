@@ -496,13 +496,13 @@ int getf4m(int sock) {
     
     memset(buf, 0, BUF_SIZE);
     
-    str = "GET /var/www/vod/big_buck_bunny.f4m HTTP/1.1\r\n\r\n";
+    str = "GET / HTTP/1.0\r\n\r\n";
     strcpy(p, str);
     p += strlen(str);
 
-    str = "Host: localhost:8889\r\nConnection: close\r\nAccept: text/html\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh-TW;q=0.4\r\n";
-    strcpy(p, str);
-    p += strlen(str);
+    //str = "Host: localhost:8889\r\nConnection: close\r\nAccept: text/html\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh-TW;q=0.4\r\n";
+    //strcpy(p, str);
+    //p += strlen(str);
 
     printf("getf4m: try send\n");
     send(sock, buf, strlen(buf), 0);
