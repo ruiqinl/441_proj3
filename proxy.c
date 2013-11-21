@@ -138,12 +138,9 @@ int main(int argc, char *argv[]){
 		    if (sock > maxfd)
 			maxfd = sock;
 
-		    assert(buf_pts[sock]->res_fully_sent == 1); // ?????
-		    
 		} else {
 		    
 		    printf("proxy: received bytes from browser/server\n");
-		    assert(buf_pts[sock]->res_fully_sent == 1); // ?????
 
 		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) 
 			FD_CLR(i, &master_read_fds);
@@ -161,7 +158,6 @@ int main(int argc, char *argv[]){
 	    // check write_fds
 	    if (FD_ISSET(i, &write_fds)) {
 		printf("proxy: write bytes to browser/server\n");
-		assert(buf_pts[sock]->res_fully_sent == 1); // ?????
 
 		general_send(i, buf_pts[i], &server_addr);
 		
