@@ -142,11 +142,11 @@ int main(int argc, char *argv[]){
 		    
 		    printf("proxy: received bytes from browser/server\n");
 
-		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) 
+		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) {
 			FD_CLR(i, &master_read_fds);
-		    else if (recv_ret == 1)
+		    } else if (recv_ret == 1) {
 			FD_SET(i, &master_write_fds);
-		    else {
+		    } else {
 			assert(recv_ret == 2);
 			// do nothing
 		    }
@@ -163,11 +163,10 @@ int main(int argc, char *argv[]){
 		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0) {
 		    FD_CLR(i, &master_write_fds);
 		    FD_SET(buf_pts[i]->sock2server, &master_read_fds);
-		    printf("???%d > old_max %d\n", buf_pts[i]->sock2server, maxfd);
+
 		    // keep track
 		    if (buf_pts[i]->sock2server > maxfd)
 			maxfd = buf_pts[i]->sock2server;
-		    printf("???new max%d\n", maxfd);
 
 		    // init buf
 		    buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));

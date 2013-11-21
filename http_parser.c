@@ -94,15 +94,16 @@ int general_recv(int sock, struct buf *bufp) {
 
     if (bufp->status == RAW || bufp->status == FROM_BROWSER) {
 	printf("general_recv: RAW/FROM_BROWSER, call recv_BROW\n");
-	return recv_BROW(sock, bufp);
+	return recv_BROW(sock, bufp);// TO_SERVER is set inside recv_BROW
     } else if (bufp->status == FROM_SERVER) {
 	printf("general_recv: FROM_SERVER, not imp yet\n");
-	return 0;
+	bufp->status = TO_BROWSER;
+	return 1;
     }
 
     printf("general_recv: other status not imp yet\n");
     
-    return 0;
+    return 1;
 }
 
 int change_rate (struct buf *bufp) {
