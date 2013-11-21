@@ -54,7 +54,10 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
 	    p2 += numbytes;
 	    bufp->http_reply_p->orig_cur = p2;
-	    printf("general_send: TO_SERVER, send %ld bytes to server:\n%s", numbytes, p2-numbytes);
+
+	    char tmp[128];
+	    inet_ntop(AF_INET, &(server_addr->sin_addr), tmp, 128);
+	    printf("general_send: TO_SERVER, send %ld bytes to server %s:\n%s", numbytes, tmp, p2-numbytes);
 	    //printf("????last 4 chars:%c%c%c%c\n", *(p2-4), *(p2-3), *(p2-2), *(p2-1));
 	    return 1;
 	/*char *s = "GET / HTTP/1.1\r\n\r\n";
