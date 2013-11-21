@@ -176,10 +176,6 @@ int main(int argc, char *argv[]){
 		    if (buf_pts[i]->status == TO_SERVER) {
 			// finished sending to server, now read from server
 			
-			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
-
-			buf_pts[buf_pts[i]->sock2server]->status == FROM_SERVER;
-
 			// keep track
 			if (buf_pts[i]->sock2server > maxfd)
 			    maxfd = buf_pts[i]->sock2server;
@@ -187,6 +183,9 @@ int main(int argc, char *argv[]){
 			// init buf
 			buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
 			init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
+
+			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
+ 			buf_pts[buf_pts[i]->sock2server]->status == FROM_SERVER;
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			printf("proxy: TO_BROWSER finished, done!\n");
