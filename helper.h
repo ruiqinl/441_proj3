@@ -173,6 +173,7 @@ struct buf {
 
     // proj3
     int status;
+    int sock2server;
     
 
 };
