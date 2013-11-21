@@ -13,5 +13,6 @@ int parse_message_body(struct buf *bufp);
 // proj3
 int general_recv(int sock, struct buf *bufp);
 int change_rate (struct buf *bufp);
+int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr);
 
 #endif

@@ -100,6 +100,7 @@ int main(int argc, char *argv[]){
     }
     
     getf4m(sock2server);
+    close(sock2server);
     
     // receive connection from browser
     
@@ -158,7 +159,7 @@ int main(int argc, char *argv[]){
 	    if (FD_ISSET(i, &write_fds)) {
 		printf("proxy: write bytes to browser/server\n");
 		
-		general_send(i, buf_pts[i], server_addr);
+		general_send(i, buf_pts[i], &server_addr);
 		
 		
 		
