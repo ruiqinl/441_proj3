@@ -500,6 +500,8 @@ int *getf4m(int sock) {
     str = "GET /vod/big_buck_bunny.f4m HTTP/1.0\r\n\r\n";
     strcpy(buf, str);
 
+    printf("send\n");
+
     while ((ret = send(sock, buf, strlen(buf), 0)) >0)
 	;
     if (ret == -1) {
@@ -508,6 +510,7 @@ int *getf4m(int sock) {
     }
 
     // recv reply
+    printf("recv\n");
     memset(buf, 0, BUF_SIZE);
 
     while ((ret = recv(sock, buf, BUF_SIZE, 0)) > 0) 
@@ -517,8 +520,7 @@ int *getf4m(int sock) {
 	exit(-1);
     }
     
-    //printf("getf4m: recv:%s\n", buf);
-    
+    printf("parse\n");
     int *res =  parsef4m(buf);
     while (res != NULL)
 	printf("%d  ", *(res++));
