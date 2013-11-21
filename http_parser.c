@@ -55,7 +55,7 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    p2 += numbytes;
 	    bufp->http_reply_p->orig_cur = p2;
 	    printf("general_send: TO_SERVER, send %ld bytes to server:\n%s", numbytes, p2-numbytes);
-	    printf("????last 4 chars:%c%c%c%c\n", *(p2-4), *(p2-3), *(p2-2), *(p2-1));
+	    //printf("????last 4 chars:%c%c%c%c\n", *(p2-4), *(p2-3), *(p2-2), *(p2-1));
 	    return 1;
 	/*char *s = "GET / HTTP/1.1\r\n\r\n";
 	if (send(sock2server, s, strlen(s), 0) == strlen(s)) {
@@ -119,6 +119,11 @@ int recv_BROW(int sock, struct buf *bufp){
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
 	    bufp->status = TO_SERVER;
+
+	    // test
+	    bufp->http_reply_p->orig_req = "GET / HTTP/1.1\r\n\r\n";
+	    bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
+	    // test
 		
 	    printf("recv_request: fully recv, change rate if necessary, and send to server\n");
 	    return 1;
