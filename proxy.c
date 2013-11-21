@@ -162,15 +162,23 @@ int main(int argc, char *argv[]){
 		// return 1 if send some bytes, return 0 if finish sending
 		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0) {
 		    FD_CLR(i, &master_write_fds);
-		    FD_SET(buf_pts[i]->sock2server, &master_read_fds);
+		    
+		    if (buf_pts[i]->status == TO_SERVER) {
+			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
 
-		    // keep track
-		    if (buf_pts[i]->sock2server > maxfd)
-			maxfd = buf_pts[i]->sock2server;
+			// keep track
+			if (buf_pts[i]->sock2server > maxfd)
+			    maxfd = buf_pts[i]->sock2server;
 
-		    // init buf
-		    buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
-		    init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
+			// init buf
+			buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
+			init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
+
+		    } else if (buf_pts[i]->status == TO_BROWSER) {
+			printf("proxy: TO_BROWSER finished, done!\n");
+
+		    }
+		    
 		    
 		} else if (send_ret == 1)
 		    ; // just keep sending
