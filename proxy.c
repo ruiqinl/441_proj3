@@ -165,6 +165,7 @@ int main(int argc, char *argv[]){
 		else if (send_ret == 1)
 		    ; // just keep sending
 		else if (send_ret == 2) {
+		    FD_CLR(i, &master_write_fds);
 		    FD_SET(buf_pts[i]->sock2server, &master_read_fds);
 		}
 		
