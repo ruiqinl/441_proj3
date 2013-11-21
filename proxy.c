@@ -137,10 +137,13 @@ int main(int argc, char *argv[]){
 		    // track maxfd 
 		    if (sock > maxfd)
 			maxfd = sock;
+
+		    assert(buf_pts[sock]->res_fully_sent == 1); // ?????
 		    
 		} else {
 		    
 		    printf("proxy: received bytes from browser/server\n");
+		    assert(buf_pts[sock]->res_fully_sent == 1); // ?????
 
 		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) 
 			FD_CLR(i, &master_read_fds);
