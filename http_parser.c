@@ -12,7 +12,7 @@
 #include "http_parser.h"
 
 // send to server/browser
-// return 1 if send some bytes, return 0 if finish sending, return 2 if expect reading
+// return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status
 int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     assert(bufp != NULL);
     assert(server_addr != NULL);
@@ -52,25 +52,29 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	assert(bytes_left == strlen(p2)); // stupid
 
 	if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
+	    char tmp[128];
+	    
+	    if (numbytes == strlen(p2)) {
+		// finish sending
+		printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
+
+		bufp->status = FROM_SERVER;
+		return 0;
+	    } 
+
+	    // prepare for next sending
 	    p2 += numbytes;
 	    bufp->http_reply_p->orig_cur = p2;
-
-	    char tmp[128];
+	    
 	    inet_ntop(AF_INET, &(server_addr->sin_addr), tmp, 128);
 	    printf("general_send: TO_SERVER, send %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
 
-	    bufp->status = FROM_SERVER;
-	    return 2;
-	/*char *s = "GET / HTTP/1.1\r\n\r\n";
-	if (send(sock2server, s, strlen(s), 0) == strlen(s)) {
-	    printf("???test: send %s\n", s);
-	    bufp->status == FROM_SERVER;
-	    return 2;*/
-	} else if (numbytes == 0) {
-	    printf("general_send: TO_SERVER, send 0 bytes, do NOT close sock2server\n");
+	    return 1;
 
-	    bufp->status = FROM_SERVER; // recv from server next time
-	    return 2;
+	} else if (numbytes == 0) {
+	    printf("Error!general_send: TO_SERVER, send 0 bytes, this should not happen\n");
+	    exit(-1);
+
 	} else if (numbytes == -1) {
 	    perror("Error! general_send, send\n");
 	    exit(-1);
