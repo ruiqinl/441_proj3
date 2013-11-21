@@ -527,8 +527,11 @@ int *getf4m(int sock) {
     
     printf("parse\n");
     int *res =  parsef4m(buf);
-    while (*res != 0)
+    
+    printf("pirnt\n");
+    while (res != 0)
 	printf("%d  ", *(res++));
+    printf("done\n");
     
     return res;
 }
