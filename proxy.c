@@ -186,6 +186,7 @@ int main(int argc, char *argv[]){
 
 			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
  			buf_pts[buf_pts[i]->sock2server]->status == FROM_SERVER;
+			printf("???????buf_pts[%d]->status = frm_ser\n",buf_pts[i]->sock2server);
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			printf("proxy: TO_BROWSER finished, done!\n");
