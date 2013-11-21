@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
-
+#include <assert.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
@@ -487,34 +487,72 @@ void logprint(const char *log_file, const char *s) {
 
 // for proj3
 
-
-int getf4m(int sock) {
+/* return a int* array of max size 16, end with NULL  */
+int *getf4m(int sock) {
     
     char buf[BUF_SIZE];
-    char *p = buf;
     char *str = NULL;
+    int ret;
     
+    // send req
     memset(buf, 0, BUF_SIZE);
     
-    str = "GET / HTTP/1.0\r\n\r\n";
-    strcpy(p, str);
-    p += strlen(str);
+    str = "GET /vod/big_buck_bunny.f4m HTTP/1.0\r\n\r\n";
+    strcpy(buf, str);
 
-    //str = "Host: localhost:8889\r\nConnection: close\r\nAccept: text/html\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh-TW;q=0.4\r\n";
-    //strcpy(p, str);
-    //p += strlen(str);
+    while ((ret = send(sock, buf, strlen(buf), 0)) >0)
+	;
+    if (ret == -1) {
+	perror("Error! getf4m, send");
+	exit(-1);
+    }
 
-    printf("getf4m: try send\n");
-    send(sock, buf, strlen(buf), 0);
-    printf("getf4m: sent\n");
-
+    // recv reply
     memset(buf, 0, BUF_SIZE);
-    if(recv(sock, buf, BUF_SIZE, 0) < 0) {
+
+    while ((ret = recv(sock, buf, BUF_SIZE, 0)) > 0) 
+	;
+    if (ret == -1){
 	printf("Error! getf4m, recv\n");
 	exit(-1);
     }
     
-    printf("getf4m: recv:%s\n", buf);
+    //printf("getf4m: recv:%s\n", buf);
+    
+    int *res =  parsef4m(buf);
+    while (res != NULL)
+	printf("%d  ", *(res++));
+    
+    return res;
+}
 
-    return 0;
+
+int *parsef4m(char *buf) {
+    assert(buf != NULL);
+
+    int max_num = 16;
+    int *rate = (int *)calloc(max_num, sizeof(int));
+    char *p = NULL;
+    char *p1, *p2;
+    int count = 0;
+
+    while ((p = strstr(buf, "bitrate")) != NULL) {
+	if ((p1 = strchr(p, '"')) == NULL || (p2 = strchr(p1+1, '"')) == NULL) {
+	    printf("Error! f4m is in wrong format\n");
+	    exit(-1);
+	}
+	
+	p1 += 1;
+	*p2 = '\0';
+	rate[count++] = atoi(p1);
+
+	if (count >= max_num-1) {
+	    printf("Warning! parsef4m, too many bitrate\n");
+	    break;
+	}
+
+	buf = p2 + 1;
+    }
+    
+    return rate;
 }

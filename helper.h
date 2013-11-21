@@ -194,6 +194,7 @@ void dbprintf_arglist(char **list);
 void logprint(const char *log_file, const char *s);
 
 // for proj3
-int getf4m(int sock);
+int *getf4m(int sock);
+int *parsef4m(char *buf);
 
 #endif
