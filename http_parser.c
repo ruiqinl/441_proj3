@@ -92,7 +92,6 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 int general_recv(int sock, struct buf *bufp) {
     assert(bufp != NULL);
 
-    printf("??????bufp->status:%x\n", bufp->status);
     if (bufp->status == RAW || bufp->status == FROM_BROWSER) {
 	printf("general_recv: RAW/FROM_BROWSER, call recv_BROW\n");
 	return recv_BROW(sock, bufp);
