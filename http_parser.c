@@ -121,7 +121,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	    bufp->status = TO_SERVER;
 
 	    // test
-	    bufp->http_reply_p->orig_req = "GET / HTTP/1.1\r\n\r\n";
+	    bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
 	    bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
 	    // test
 		
