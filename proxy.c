@@ -168,6 +168,11 @@ int main(int argc, char *argv[]){
 		    if (buf_pts[i]->sock2server > maxfd)
 			maxfd = buf_pts[i]->sock2server;
 		    printf("???new max%d\n", maxfd);
+
+		    // init buf
+		    buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
+		    init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", NULL, i);
+		    
 		} else if (send_ret == 1)
 		    ; // just keep sending
 		
