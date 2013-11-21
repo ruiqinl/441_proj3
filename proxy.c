@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     fd_set master_read_fds, master_write_fds;
 
     struct buf* buf_pts[MAX_SOCK];
-    int i, recv_ret;
+    int i, recv_ret, send_ret;
     
     
     
@@ -158,12 +158,15 @@ int main(int argc, char *argv[]){
 	    // check write_fds
 	    if (FD_ISSET(i, &write_fds)) {
 		printf("proxy: write bytes to browser/server\n");
-
-		if (general_send(i, buf_pts[i], &server_addr) == 0)
-		    FD_CLR(i, &master_write_fds);
-		else 
-		    ; // just keep sending
 		
+		// return 1 if send some bytes, return 0 if finish sending, return 2 if expect reading
+		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0)
+		    FD_CLR(i, &master_write_fds);
+		else if (send_ret == 1)
+		    ; // just keep sending
+		else if (send_ret == 2) {
+		    FD_SET(buf_pts[i]->sock2server, &master_read_fds);
+		}
 		
 	    }
 	}

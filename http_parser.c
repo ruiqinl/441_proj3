@@ -12,7 +12,7 @@
 #include "http_parser.h"
 
 // send to server/browser
-// return 1 if send some bytes, return 0 if finished sending
+// return 1 if send some bytes, return 0 if finish sending, return 2 if expect reading
 int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     assert(bufp != NULL);
     assert(server_addr != NULL);
@@ -58,7 +58,9 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	} else if (numbytes == 0) {
 	    printf("general_send: TO_SERVER, send 0 bytes, close sock2server\n");
 	    close(sock2server);
-	    return 0;
+
+	    bufp->status = FROM_SERVER; // recv from server next time
+	    return 2;
 	} else if (numbytes == -1) {
 	    perror("Error! general_send, send\n");
 	    exit(-1);
