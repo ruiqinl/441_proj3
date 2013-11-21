@@ -24,7 +24,8 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     if (bufp->status == TO_SERVER) {
 	printf("general_send: TO_SERVER\n");
 
-	dequeue_request(bufp);
+	//dequeue_request(bufp);// it's doen in general_recv already
+	assert(bufp->http_reply_p != NULL);
 
 	// server side of proxy: whatever, get f4m first
 	if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {

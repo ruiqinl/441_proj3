@@ -161,7 +161,8 @@ int main(int argc, char *argv[]){
 	    // check write_fds
 	    if (FD_ISSET(i, &write_fds)) {
 		printf("proxy: write bytes to browser/server\n");
-		
+		assert(buf_pts[sock]->res_fully_sent == 1); // ?????
+
 		general_send(i, buf_pts[i], &server_addr);
 		
 		
