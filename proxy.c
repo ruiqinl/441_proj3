@@ -171,7 +171,7 @@ int main(int argc, char *argv[]){
 
 		    // init buf
 		    buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
-		    init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", NULL, i);
+		    init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
 		    
 		} else if (send_ret == 1)
 		    ; // just keep sending

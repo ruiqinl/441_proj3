@@ -123,7 +123,7 @@ struct buf {
 
     struct req_queue *req_queue_p;
 
-    // reception part
+    // reception part from browser
     struct http_req *http_req_p;
     int req_line_header_received;
     int req_body_received;
