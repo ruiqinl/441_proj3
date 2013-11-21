@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
@@ -62,7 +63,8 @@ void init_req_queue(struct req_queue *p) {
     p->req_count = 0;
 }
 
-void init_buf(struct buf* bufp, const char *cgiscript, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int port){
+//void init_buf(struct buf* bufp, const char *cgiscript, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int port){
+void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int port){
 
     char clientIP[INET6_ADDRSTRLEN];
     const char *p = inet_ntop(AF_INET, &(cli_addr->sin_addr), clientIP, INET6_ADDRSTRLEN);

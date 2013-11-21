@@ -164,7 +164,7 @@ struct buf {
 
 };
 
-void init_buf(struct buf *bufp, const char *cgiscript, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int server_port);
+void init_buf(struct buf *bufp, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int server_port);
 void reset_buf(struct buf *bufp);
 void reset_rbuf(struct buf *bufp);
 int is_2big(int fd);

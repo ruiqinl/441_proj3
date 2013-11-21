@@ -40,7 +40,8 @@ int main(int argc, char *argv[]){
     fd_set master_read_fds, master_write_fds;
 
     struct buf* buf_pts[MAX_SOCK];
-    int i;
+    int i, recv_ret;
+    
     
     // parse argv
     if (argc < 8) {
@@ -53,7 +54,6 @@ int main(int argc, char *argv[]){
     dns_ip = argv[5];
     dns_port = atoi(argv[6]);
     www_ip = argv[7];
-    printf("www_ip %s\n", www_ip);
 
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -72,12 +72,12 @@ int main(int argc, char *argv[]){
 	perror("Error! main, listen");
 	exit(-1);
     }
-    
-    if((sock = accept(listen_sock, (struct sockaddr *)&cli_addr, &cli_size)) == -1){
-	perror("Error! main, accpet");
-	exit(-1);
-    }
 
+    maxfd = listen_sock;
+    FD_ZERO(&master_read_fds);
+    FD_ZERO(&master_write_fds);
+    FD_SET(listen_sock, &master_read_fds);
+    
     // server side of proxy: addr
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -93,10 +93,10 @@ int main(int argc, char *argv[]){
 	exit(-1);
     }
 
-    if (connect(sock2server, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+    /*if (connect(sock2server, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
 	perror("Error! main, connect, socket2server");
 	exit(-1);
-    }
+	}*/
     
     getf4m(sock2server);
     
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
 	write_fds = master_write_fds;
 	
 	if (select(maxfd+1, &read_fds, &write_fds, NULL, NULL) == -1) {
-	    perror("Error! main, select");
+	    perror("Error! proxy, select");
 	    close_socket(sock);
 	    return(-1);
 	}
@@ -119,15 +119,49 @@ int main(int argc, char *argv[]){
 	    if (FD_ISSET(i, &read_fds)) {
 		
 		if (i == listen_sock) {
-		    printf("main: received new connection from browser\n");
-		} else 
-		    printf("main: received bytes from browser/server\n");
+
+		    printf("proxy: received new connection from browser\n");
+
+		    if((sock = accept(listen_sock, (struct sockaddr *)&cli_addr, &cli_size)) == -1){
+			perror("Error! proxy, accpet");
+			exit(-1);
+		    }
+		    
+		    FD_SET(sock, &master_read_fds);
+		    buf_pts[sock] = (struct buf*)calloc(1, sizeof(struct buf));
+		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
+		    printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);
+
+		    // track maxfd 
+		    if (sock > maxfd)
+			maxfd = sock;
+		    
+		} else {
+		    
+		    printf("proxy: received bytes from browser/server\n");
+		    
+		    recv_ret = recv_request(i, buf_pts[i]); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
+		    printf("===========================================================\n");
+		    printf("proxy: recv_request from sock %d, recv_ret is %d\n", i, recv_ret);
+
+		    if (recv_ret == 1){
+			parse_request(buf_pts[i]);
+			dbprint_queue(buf_pts[i]->req_queue_p);
+
+			if (buf_pts[i]->req_queue_p->req_count > 0) {
+			    printf("proxy: what to do now??\n");
+			}
+		    }
+			    
+
+		    FD_CLR(i, &master_read_fds);
+		}
 	    }
 
 	    // check write_fds
 	    if (FD_ISSET(i, &write_fds)) {
 		
-		printf("main: write bytes to browser/server\n");
+		printf("proxy: write bytes to browser/server\n");
 	    }
 	}
 

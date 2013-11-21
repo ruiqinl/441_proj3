@@ -28,7 +28,6 @@ int recv_request(int sock, struct buf *bufp) {
 	return 0;
     }
 
-
     readbytes = recv(sock, bufp->rbuf_tail, bufp->rbuf_free_size, 0);
 
     // update rbuf
