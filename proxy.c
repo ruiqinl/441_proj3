@@ -43,6 +43,7 @@ int main(int argc, char *argv[]){
     int i, recv_ret;
     
     
+    
     // parse argv
     if (argc < 8) {
 	printf("Usage: ./proxy <log> <alpha> <listen_port> <fake-ip> <dns-ip> <dns-port> <www-ip>\n");
@@ -139,20 +140,8 @@ int main(int argc, char *argv[]){
 		} else {
 		    
 		    printf("proxy: received bytes from browser/server\n");
-		    
-		    recv_ret = recv_request(i, buf_pts[i]); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
-		    printf("===========================================================\n");
-		    printf("proxy: recv_request from sock %d, recv_ret is %d\n", i, recv_ret);
 
-		    if (recv_ret == 1){
-			parse_request(buf_pts[i]);
-			dbprint_queue(buf_pts[i]->req_queue_p);
-
-			if (buf_pts[i]->req_queue_p->req_count > 0) {
-			    printf("proxy: what to do now??\n");
-			}
-		    }
-			    
+		    general_recv(i, buf_pts[i]);
 
 		    FD_CLR(i, &master_read_fds);
 		}

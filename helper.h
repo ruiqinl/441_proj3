@@ -89,6 +89,9 @@ struct http_req {
     char *cgi_env_list[ARG_MAX];
     int fds[2];
 
+    // proj3
+    char *orig_req;
+
     struct http_req *next;
 
 };
@@ -100,6 +103,12 @@ struct req_queue {
     int req_count;    
 
 };
+
+#define RAW 0x00
+#define FROM_BROWSER 0x01
+#define TO_BROWSER 0x02
+#define FROM_SERVER 0x04
+#define TO_SERVER 0x08
 
 struct buf {
 
@@ -160,6 +169,9 @@ struct buf {
     
     //int cgi_fully_sent;
     //int cgi_fully_received;
+
+    // proj3
+    int status;
     
 
 };

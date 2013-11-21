@@ -124,6 +124,9 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     //bufp->cgi_fully_sent = 0;
     //bufp->cgi_fully_received = 0;
 
+    //proj3
+    bufp->status = RAW;
+
 }
 
 

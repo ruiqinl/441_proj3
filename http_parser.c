@@ -6,10 +6,55 @@
 #include <sys/socket.h>
 #include <time.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "helper.h"
 #include "http_parser.h"
 
+// return 1 if fully received a request, return 0 if bytes received, 2 if partially received
+int general_recv(int sock, struct buf *bufp) {
+    assert(bufp != NULL);
+
+    int recv_ret;
+
+    if (bufp->status == RAW) {
+	printf("general_recv: RAW, call recv_request\n");
+
+	recv_ret = recv_request(sock, bufp); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
+	printf("===========================================================\n");
+	printf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
+
+	if (recv_ret == 1){
+	    parse_request(bufp);
+	    dbprint_queue(bufp->req_queue_p);
+
+	    if (bufp->req_queue_p->req_count > 0) {
+		dequeue_request(bufp); 
+		change_rate(bufp);
+		bufp->status = TO_SERVER;
+		
+		printf("recv_request: fully recv, change rate if necessary, and send to server\n");
+		return 1;
+	    } else  {
+		printf("recv_request: partially recv, keep receiving\n");
+		return 2;
+	    }
+
+	} else {
+	    printf("recv_request: recv 0 bytes, need to clear sock %d from master_read_fds\n", sock);
+	    return 0;
+	}
+    }
+
+    printf("general_recv: other status not imp yet\n");
+    
+    return 0;
+}
+
+int change_rate (struct buf *bufp) {
+    printf("change_rate: not implemented yet\n");
+    return 0;
+}
 
 /* Return errcode, -1:recv error, 0: recv 0, 1:recv some bytes */
 int recv_request(int sock, struct buf *bufp) {
