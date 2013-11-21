@@ -33,7 +33,7 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    exit(-1);
 	}
     
-	if (connect(sock2server, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+	if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(server_addr)) == -1) {
 	    perror("Error! general_send, connect, socket2server");
 	    exit(-1);
 	}
