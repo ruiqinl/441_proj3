@@ -53,10 +53,11 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 
 	if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
 	    char tmp[128];
+	    inet_ntop(AF_INET, &(server_addr->sin_addr), tmp, 128);
 	    
 	    if (numbytes == strlen(p2)) {
 		// finish sending
-		printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
+		printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2);
 
 		bufp->status = FROM_SERVER;
 		return 0;
@@ -66,7 +67,6 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    p2 += numbytes;
 	    bufp->http_reply_p->orig_cur = p2;
 	    
-	    inet_ntop(AF_INET, &(server_addr->sin_addr), tmp, 128);
 	    printf("general_send: TO_SERVER, send %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
 
 	    return 1;
