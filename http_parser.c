@@ -97,8 +97,7 @@ int general_recv(int sock, struct buf *bufp) {
 	return recv_BROW(sock, bufp);
     } else if (bufp->status == FROM_SERVER) {
 	printf("general_recv: FROM_SERVER, not imp yet\n");
-	//bufp->status = TO_BROWSER;
-	return 1;
+	return recv_SERVER(sock, bufp);
     }
 
     printf("general_recv: other status not imp yet\n");
@@ -110,6 +109,30 @@ int change_rate (struct buf *bufp) {
     printf("change_rate: not implemented yet\n");
     return 0;
 }
+
+int recv_SERVER(int sock, struct buf *bufp) {
+    assert(bufp != NULL);
+
+    int recv_ret;
+    size_t recv_size = 0;
+
+    while ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_tail-bufp->buf_head, 0)) > 0) {
+	recv_size += recv_ret;
+
+	bufp->buf_head += recv_ret;
+	
+	if (recv_size > SEG_SIZE) {
+	    printf("Error! recv_SERVER, overflow\n");
+	    exit(-1);
+	}
+	
+    }
+
+    printf("*****************\n");
+    exit(-1);
+
+}
+
 
 // return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 int recv_BROW(int sock, struct buf *bufp){
@@ -130,8 +153,8 @@ int recv_BROW(int sock, struct buf *bufp){
 	    //bufp->status = TO_SERVER;
 
 	    // test
-	    bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
-	    bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
+	    //bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
+	    //bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
 	    // test
 		
 	    printf("recv_request: fully recv, change rate if necessary, and send to server\n");

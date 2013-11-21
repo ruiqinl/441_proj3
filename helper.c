@@ -99,7 +99,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     // reply part
     bufp->http_reply_p = NULL;
 
-    bufp->buf = (char *) calloc(BUF_SIZE, sizeof(char));    
+    bufp->buf = (char *) calloc(SEG_SIZE, sizeof(char));    
     //memset(bufp->buf, 0, BUF_SIZE);
     bufp->buf_head = bufp->buf; // p is not used yet in checkpoint-1
     bufp->buf_tail = bufp->buf_head; // empty buffer, off-1 sentinal

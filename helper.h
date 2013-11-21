@@ -111,6 +111,8 @@ struct req_queue {
 #define FROM_SERVER 0x04
 #define TO_SERVER 0x08
 
+#define SEG_SIZE 4*1024*1024 // 4m
+
 struct buf {
 
     int is_cgi_req;

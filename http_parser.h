@@ -16,5 +16,6 @@ int recv_BROW(int sock, struct buf *bufp);
 int change_rate (struct buf *bufp);
 int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr);
 
+int recv_SERVER(int sock, struct buf *bufp);
 
 #endif
