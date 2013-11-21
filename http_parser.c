@@ -43,10 +43,10 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	p2 = bufp->http_reply_p->orig_cur;
 	assert(p1 != NULL); 
 	assert(p2 != NULL);
-	assert(p2 > p1);
+	assert(p2 >= p1);
 	
 	bytes_sent = p2 - p1;
-	bytes_left = strlen(p1);
+	bytes_left = strlen(p2);
 	assert(bytes_left == strlen(p2)); // stupid
 	if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
 	    p2 += numbytes;
