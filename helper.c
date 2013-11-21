@@ -493,7 +493,8 @@ int *getf4m(int sock) {
     char buf[BUF_SIZE];
     char *str = NULL;
     int ret;
-    
+    char *p = NULL;
+
     // send req
     memset(buf, 0, BUF_SIZE);
     
@@ -502,8 +503,10 @@ int *getf4m(int sock) {
 
     printf("send\n");
 
-    while ((ret = send(sock, buf, strlen(buf), 0)) >0)
-	;
+    p = buf;
+    while ((ret = send(sock, p, strlen(p), 0)) >0) 
+	p += ret;
+
     if (ret == -1) {
 	perror("Error! getf4m, send");
 	exit(-1);
@@ -513,8 +516,10 @@ int *getf4m(int sock) {
     printf("recv\n");
     memset(buf, 0, BUF_SIZE);
 
-    while ((ret = recv(sock, buf, BUF_SIZE, 0)) > 0) 
-	;
+    p = buf;
+    while ((ret = recv(sock, p, BUF_SIZE, 0)) > 0) 
+	p += ret;
+
     if (ret == -1){
 	printf("Error! getf4m, recv\n");
 	exit(-1);
@@ -522,7 +527,7 @@ int *getf4m(int sock) {
     
     printf("parse\n");
     int *res =  parsef4m(buf);
-    while (res != NULL)
+    while (*res != 0)
 	printf("%d  ", *(res++));
     
     return res;
