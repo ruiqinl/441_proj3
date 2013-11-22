@@ -141,7 +141,7 @@ int main(int argc, char *argv[]){
 		} else {
 		    
 		    printf("proxy: received bytes from browser/server\n");
-
+		    
 		    // return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) {
 			// whichever status, FD_CLR i
@@ -152,8 +152,10 @@ int main(int argc, char *argv[]){
 			FD_SET(i, &master_write_fds);
 			
 			if (buf_pts[i]->status == FROM_BROWSER 
-			    || buf_pts[i]->status == RAW)
+			    || buf_pts[i]->status == RAW) {
 			    buf_pts[i]->status = TO_SERVER;
+			    buf_pts[i]->sock2browser = i;
+			}
 			if (buf_pts[i]->status == FROM_SERVER)
 			    buf_pts[i]->status = TO_BROWSER;
 			
@@ -179,17 +181,17 @@ int main(int argc, char *argv[]){
 			// keep track
 			if (buf_pts[i]->sock2server > maxfd)
 			    maxfd = buf_pts[i]->sock2server;
-
+			
 			// init buf
 			buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
 			init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
 
 			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
  			buf_pts[buf_pts[i]->sock2server]->status = FROM_SERVER;
+			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
-			printf("proxy: TO_BROWSER finished, done!\n");
-
+			general_send(i, buf_pts[i], NULL);
 		    }
 		    
 		    

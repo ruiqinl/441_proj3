@@ -15,16 +15,18 @@
 // return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status
 int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     assert(bufp != NULL);
-    assert(server_addr != NULL);
+    
     
     int sock2server;
     size_t numbytes, bytes_sent, bytes_left;
     char *p1, *p2;
 
+    int send_ret;
+
     if (bufp->status == TO_SERVER) {
 	printf("general_send: TO_SERVER\n");
 
-	//dequeue_request(bufp);// it's doen in general_recv already
+	assert(server_addr != NULL);
 	assert(bufp->http_reply_p != NULL);
 
 	// server side of proxy: whatever, get f4m first
@@ -80,9 +82,21 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	}
 	
     } else if (bufp->status == TO_BROWSER) {
-	printf("general_send: TO_BROWSER, not imp yet\n");
+	printf("general_send: TO_BROWSER, send to sock %d\n", bufp->sock2browser);
 	
-	return 0;
+	printf("??????buf_head:\n%s\n", bufp->buf_head);
+	while ((send_ret = send(bufp->sock2browser, bufp->buf_head, bufp->buf_tail - bufp->buf_head, 0)) > 0) {
+	    bufp->buf_head += send_ret;
+	}
+	if (send_ret == -1){
+	    perror("Error! general_send, send to brow\n"); 
+	    exit(-1);
+	}
+	if (send_ret == 0) {
+	    printf("general_send: send 0 bytes, finished\n");
+	    return 0;
+	}
+
     }
 
     return 0;
@@ -96,12 +110,13 @@ int general_recv(int sock, struct buf *bufp) {
 	printf("general_recv: RAW/FROM_BROWSER, call recv_BROW\n");
 	return recv_BROW(sock, bufp);
     } else if (bufp->status == FROM_SERVER) {
-	printf("general_recv: FROM_SERVER, not imp yet\n");
+	printf("general_recv: FROM_SERVER, call recv_SERVER\n");
 	return recv_SERVER(sock, bufp);
     }
 
-    printf("general_recv: other status not imp yet\n");
-    
+    printf("Error! general_recv: wrong status\n");
+    exit(-1);
+
     return 1;
 }
 
@@ -121,7 +136,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
     int cont_len;
     char *con;
 
-    if ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_free_size, 0)) == -1) {
+    if ((recv_ret = recv(sock, bufp->buf_tail, bufp->buf_free_size, 0)) == -1) {
 	perror("Error! recv_SERVER, recv");
 	exit(-1);
     }
@@ -129,7 +144,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
     if (recv_ret > 0) {
 	printf("recv_SERVER: recv %d bytes\n", recv_ret);
 
-	bufp->buf_head += recv_ret;
+	bufp->buf_tail += recv_ret;
 	bufp->buf_free_size -= recv_ret;
 	if (bufp->buf_free_size <= 0) {
 	    printf("Error! recv_SERVER, overflow\n");
@@ -146,8 +161,8 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    printf("recv_SERVER: Content-Lneght:s:%s, d:%d\n", tmp, cont_len);
 
 	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
-		printf("recv_SERVER: cont len:%ld\n", bufp->buf_head - (p1+4));
-		if (bufp->buf_head - (p1+4) == cont_len) {
+		printf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
+		if (bufp->buf_tail - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n");
 		    return 1;
 		}

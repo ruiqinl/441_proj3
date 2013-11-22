@@ -129,7 +129,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     //proj3
     bufp->status = RAW;
     bufp->sock2server = -1;
-
+    bufp->sock2browser = -1;
 }
 
 
