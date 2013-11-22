@@ -205,7 +205,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	    printf("recv_request: fully recv, change rate if necessary, and send to server\n");
 	    // avoid 303
 	    if ((p = strstr(bufp->http_req_p->orig_req, "If-None-Match:")) != NULL)
-		*p = '\0';
+		memcpy(p, "\r\n\r\n\0", strlen("\r\n\r\n\0"));
 
 	    return 1;
 	} else  {
