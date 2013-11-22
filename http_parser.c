@@ -119,6 +119,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
     char *p2 = NULL;
     char tmp[128];
     int cont_len;
+    char *con;
 
     if ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_free_size, 0)) == -1) {
 	perror("Error! recv_SERVER, recv");
@@ -135,19 +136,18 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    exit(-1);
 	}
 
-	char *con = "Content-Length: ";
+	con = "Content-Length: ";
 	if((p1 = strstr(bufp->buf, con)) != NULL
 	   && (p2 = strstr(p1, "\r\n")) != NULL) {
 	    memset(tmp, 0, 128);
 	    p1 += strlen(con);
 	    memcpy(tmp, p1, p2-p1);
 	    cont_len = atoi(tmp);
-	    printf("recv_SERVER: cont_len:s:%s, d:%d\n", tmp, cont_len);
+	    printf("recv_SERVER: Content-Lneght:s:%s, d:%d\n", tmp, cont_len);
 
-	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL
-		&& (p2 = strstr(p1+4, "\r\n")) != NULL) {
-		printf("recv_SERVER: recvd cont length:%ld\n", (p2+2) - (p1+4));
-		if ((p2+2) - (p1+4) == cont_len){
+	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
+		printf("recv_SERVER: cont len:%ld\n", bufp->buf_head - (p1+4));
+		if (bufp->buf_head - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n");
 		    return 1;
 		}
