@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 
-#define DEBUG 1
+#define DEBUG 0
 #define dbprintf(...) do{if(DEBUG) fprintf(stderr, __VA_ARGS__); }while(0)
 
 #define MAX_SOCK 1024
