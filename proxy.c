@@ -192,10 +192,8 @@ int main(int argc, char *argv[]){
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
-			//close(i);
+			close(i);
 		    }
-		    close(i);
-		    reset_buf(buf_pts[i]);
 		    
 		} else if (send_ret == 1)
 		    ; // just keep sending
