@@ -206,16 +206,19 @@ int main(int argc, char *argv[]){
 			// throughput
 			assert(buf_pts[i]->ts != 0);
 			assert(buf_pts[i]->tf != 0);
-			assert(buf_pts[i]->tf > buf_pts[i]->ts);
+			assert(buf_pts[i]->tf >= buf_pts[i]->ts);
 
 			time_diff = difftime(buf_pts[i]->tf, buf_pts[i]->ts);
-			tmp_throughput = buf_pts[i]->Bsize / time_diff; 
-			if (throughput == 0.0) {
-			    throughput = tmp_throughput;
-			} else {
-			    throughput = alpha * throughput + (1 - alpha) * tmp_throughput;
+			if (time_diff != 0) {
+			    tmp_throughput = buf_pts[i]->Bsize / time_diff; 
+			    if (throughput == 0.0) {
+				throughput = tmp_throughput;
+			    } else {
+				throughput = alpha * throughput + (1 - alpha) * tmp_throughput;
+			    }
+			    printf("proxy: time_diff:%f, thru:%f\n", time_diff, throughput);
 			}
-			printf("proxy: time_diff:%f, thru:%f\n", time_diff, throughput);
+			
 			
 		    }
 		    
