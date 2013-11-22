@@ -240,6 +240,10 @@ void reset_rbuf(struct buf *bufp) {
 	bufp->rbuf_size = 0;
 	bufp->rbuf_free_size = BUF_SIZE;
 
+	bufp->status = RAW;
+	bufp->sock2browser = -1;
+	bufp->sock2server = -1;
+
     } else 
 	fprintf(stderr, "Warnning: reset_rbuf, buf is not allocated yet\n");
     
