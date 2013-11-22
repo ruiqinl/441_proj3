@@ -143,7 +143,6 @@ int recv_SERVER(int sock, struct buf *bufp) {
 
     if (recv_ret > 0) {
 	printf("recv_SERVER: recv %d bytes\n", recv_ret);
-	printf("??%s\n", bufp->buf_tail);
 
 	bufp->buf_tail += recv_ret;
 	bufp->buf_free_size -= recv_ret;
@@ -183,6 +182,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 int recv_BROW(int sock, struct buf *bufp){
 
     int recv_ret;
+    char *p;
 	
     recv_ret = recv_request(sock, bufp); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
     printf("===========================================================\n");
@@ -203,6 +203,10 @@ int recv_BROW(int sock, struct buf *bufp){
 	    // test
 		
 	    printf("recv_request: fully recv, change rate if necessary, and send to server\n");
+	    // avoid 303
+	    if ((p = strstr(bufp->http_req_p->orig_req, "If-None-Match:")) != NULL)
+		*p = '\0';
+
 	    return 1;
 	} else  {
 	    printf("recv_request: partially recv, keep receiving\n");
