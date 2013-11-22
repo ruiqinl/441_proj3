@@ -213,16 +213,36 @@ int recv_BROW(int sock, struct buf *bufp){
 	if (bufp->req_queue_p->req_count > 0) {
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
-	    //bufp->status = TO_SERVER;
 	    
 	    // test
 	    //bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
 	    //bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
 	    // test
 		
-	    printf("recv_request: fully recv, change rate if necessary, and send to server\n");
-	    // avoid 303
+	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
+	    
 	    char *p;
+	    char *new_buf = (char *)calloc(strlen(bufp->http_req_p->orig_req), sizeof(char));
+	    
+	    int len;
+	    char *close_str = "Connection: close\r\n";
+	    char *alive_str = "Connection: Keep-Alive\r\n";
+	    // switch to close
+	    if ((p = strstr(bufp->http_req_p->orig_req, alive_str)) != NULL) {
+		len = p - bufp->http_req_p->orig_req;
+		memcpy(new_buf, bufp->http_req_p->orig_req, len);
+		memcpy(new_buf+len, close_str);
+
+		len = strlen(p + strlen(alive_str));
+		memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len);
+
+		bufp->http_req_p->orig_req = new_buf;
+		printf("??????new_buf:\n%s", bufp->http_req_p->orig_req);
+		exit(-1);
+	    }
+	    
+	    // avoid 303
+	    
 	    if ((p = strstr(bufp->http_req_p->orig_req, "If-None-Match:")) != NULL) {
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';

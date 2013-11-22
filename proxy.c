@@ -100,7 +100,8 @@ int main(int argc, char *argv[]){
     
     getf4m(sock2server);
     close(sock2server);
-    
+    printf("proxy: got f4m\n");
+
     // receive connection from browser
     
     while (1) {
