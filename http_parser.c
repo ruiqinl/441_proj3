@@ -239,12 +239,10 @@ int recv_BROW(int sock, struct buf *bufp){
 		memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len_left);
 
 		bufp->http_req_p->orig_req = new_buf;
-		printf("??????new_buf:\n%s", bufp->http_req_p->orig_req);
-		exit(-1);
+
 	    }
 	    
 	    // avoid 303
-	    
 	    if ((p = strstr(bufp->http_req_p->orig_req, "If-None-Match:")) != NULL) {
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';
