@@ -143,6 +143,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 
     if (recv_ret > 0) {
 	printf("recv_SERVER: recv %d bytes\n", recv_ret);
+	printf("??%s\n", bufp->buf_tail);
 
 	bufp->buf_tail += recv_ret;
 	bufp->buf_free_size -= recv_ret;
