@@ -93,7 +93,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->line_head = bufp->rbuf;
     bufp->line_tail = bufp->rbuf;
     bufp->parse_p = bufp->rbuf;
-    bufp->rbuf_free_size = SEG_SIZE;
+    bufp->rbuf_free_size = BUF_SIZE;
     bufp->rbuf_size = 0;
 
     // reply part
@@ -219,6 +219,11 @@ void reset_buf(struct buf* bufp) {
 
 	bufp->buf_size = 0;
 	bufp->buf_free_size = BUF_SIZE;
+
+	bufp->status = RAW;
+	bufp->sock2server = -1;
+	bufp->sock2browser = -1;
+
 
     } else 
 	fprintf(stderr, "Warning: reset_buf, buf is not allocated yet\n");

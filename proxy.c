@@ -98,8 +98,11 @@ int main(int argc, char *argv[]){
 	exit(-1);
     }
     
+    printf("proxy: trying to get f4m\n");
     getf4m(sock2server);
     close(sock2server);
+    printf("proxy: got f4m\n");
+    
     
     // receive connection from browser
     
@@ -146,8 +149,7 @@ int main(int argc, char *argv[]){
 			// whichever status, FD_CLR i
 			FD_CLR(i, &master_read_fds);
 		    } else if (recv_ret == 1) {
-			// whichever status, FD_CLR read_fds, and FD_SET write_fds
-			FD_CLR(i, &master_read_fds);
+			// whichever status, and FD_SET write_fds
 			FD_SET(i, &master_write_fds);
 			
 			if (buf_pts[i]->status == FROM_BROWSER 
@@ -190,7 +192,7 @@ int main(int argc, char *argv[]){
  			buf_pts[buf_pts[i]->sock2server]->status = FROM_SERVER;
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 			
-			reset_buf(buf_pts[i]);
+			//reset_buf(buf_pts[i]);
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			reset_buf(buf_pts[i]);
 			//close(i);
