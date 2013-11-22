@@ -155,7 +155,6 @@ int recv_SERVER(int sock, struct buf *bufp) {
     int cont_len;
     char *con;
     
-    assert(bufp->buf_head == bufp->buf_tail);
     if ((recv_ret = recv(sock, bufp->buf_tail, bufp->buf_free_size, 0)) == -1) {
 	perror("Error! recv_SERVER, recv");
 	exit(-1);
@@ -181,7 +180,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    printf("recv_SERVER: Content-Lneght:s:%s, d:%d\n", tmp, cont_len);
 
 	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
-		printf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
+		printf("recv_SERVER: computed length:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n\n\n");
 		    printf("%s", bufp->buf_tail - cont_len);

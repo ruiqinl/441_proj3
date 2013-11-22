@@ -93,7 +93,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->line_head = bufp->rbuf;
     bufp->line_tail = bufp->rbuf;
     bufp->parse_p = bufp->rbuf;
-    bufp->rbuf_free_size = BUF_SIZE;
+    bufp->rbuf_free_size = SEG_SIZE;
     bufp->rbuf_size = 0;
 
     // reply part
@@ -104,7 +104,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->buf_head = bufp->buf; // p is not used yet in checkpoint-1
     bufp->buf_tail = bufp->buf_head; // empty buffer, off-1 sentinal
 
-    bufp->buf_free_size = BUF_SIZE;
+    bufp->buf_free_size = SEG_SIZE;
     bufp->buf_size = 0;
 
     bufp->res_line_header_created = 0;
