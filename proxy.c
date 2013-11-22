@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <assert.h>
+#include <time.h>
 
 #include "helper.h"
 #include "http_replyer.h"
@@ -41,19 +42,26 @@ int main(int argc, char *argv[]){
     struct buf* buf_pts[MAX_SOCK];
     int i, recv_ret, send_ret;
     
+    double throughput = 0.0;
+    double time_diff = 0.0;
+    double tmp_throughput = 0.0;
     
+    double alpha;
     
     // parse argv
     if (argc < 8) {
 	printf("Usage: ./proxy <log> <alpha> <listen_port> <fake-ip> <dns-ip> <dns-port> <www-ip>\n");
 	return -1;
     }
-
+    
+    alpha = atof(argv[2]);
     listen_port = atoi(argv[3]);
     fake_ip = argv[4];
     dns_ip = argv[5];
     dns_port = atoi(argv[6]);
     www_ip = argv[7];
+
+    printf("alpha:%f\n", alpha);
 
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -190,9 +198,25 @@ int main(int argc, char *argv[]){
 			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
  			buf_pts[buf_pts[i]->sock2server]->status = FROM_SERVER;
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
+			buf_pts[buf_pts[i]->sock2server]->ts = buf_pts[i]->ts;
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			close(i);
+			
+			// throughput
+			assert(buf_pts[i]->ts != 0);
+			assert(buf_pts[i]->tf != 0);
+			assert(buf_pts[i]->tf > buf_pts[i]->ts);
+
+			time_diff = difftime(buf_pts[i]->tf, buf_pts[i]->ts);
+			tmp_throughput = buf_pts[i]->Bsize / time_diff; 
+			if (throughput == 0.0) {
+			    throughput = tmp_throughput;
+			} else {
+			    throughput = alpha * throughput + (1 - alpha) * tmp_throughput;
+			}
+			printf("proxy: time_diff:%f, thru:%f\n", time_diff, throughput);
+			
 		    }
 		    
 		} else if (send_ret == 1)

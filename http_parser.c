@@ -140,7 +140,9 @@ int general_recv(int sock, struct buf *bufp) {
 }
 
 int change_rate (struct buf *bufp) {
-    printf("change_rate: not implemented yet\n");
+    
+
+
     return 0;
 }
 
@@ -183,6 +185,15 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		printf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n");
+
+		    // time
+		    time(&(bufp->tf));
+		    printf("recv_SERVER: time tf:%ld\n", bufp->tf);
+		    
+		    // size
+		    bufp->Bsize = strlen(bufp->buf);
+		    printf("recv_SERVER: Bsize:%ld\n", bufp->Bsize);
+		    
 		    return 1;
 		}
 	    }
@@ -206,6 +217,11 @@ int recv_BROW(int sock, struct buf *bufp){
     printf("===========================================================\n");
     printf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
 
+    if (bufp->ts != -1) {
+	time(&(bufp->ts));
+	printf("recv_BROW: time ts:%ld\n", bufp->ts);
+    }
+
     if (recv_ret == 1){
 	parse_request(bufp);
 	//dbprint_queue(bufp->req_queue_p);
@@ -214,10 +230,6 @@ int recv_BROW(int sock, struct buf *bufp){
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
 	    
-	    // test
-	    //bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
-	    //bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
-	    // test
 		
 	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 	    

@@ -177,7 +177,10 @@ struct buf {
     int status;
     int sock2server;
     int sock2browser;
-    
+
+    time_t ts;
+    time_t tf;
+    size_t Bsize;
 
 };
 
