@@ -152,6 +152,7 @@ int main(int argc, char *argv[]){
 			FD_CLR(i, &master_read_fds);
 		    } else if (recv_ret == 1) {
 			// whichever status, and FD_SET write_fds
+			FD_CLR(i, &master_read_fds);
 			FD_SET(i, &master_write_fds);
 			
 			if (buf_pts[i]->status == FROM_BROWSER 
