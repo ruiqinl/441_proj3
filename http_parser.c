@@ -222,11 +222,13 @@ int recv_BROW(int sock, struct buf *bufp){
 	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 	    
 	    char *p;
-	    char *new_buf = (char *)calloc(strlen(bufp->http_req_p->orig_req), sizeof(char));
+	    char *new_buf = (char *)calloc(2*strlen(bufp->http_req_p->orig_req), sizeof(char));
 	    
 	    int len;
 	    char *close_str = "Connection: close\r\n";
 	    char *alive_str = "Connection: keep-alive\r\n";
+
+	    printf("????orig_buf:\n%s", bufp->http_req_p->orig_req);
 	    // switch to close
 	    if ((p = strstr(bufp->http_req_p->orig_req, alive_str)) != NULL) {
 		len = p - bufp->http_req_p->orig_req;
