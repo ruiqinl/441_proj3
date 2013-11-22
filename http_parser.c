@@ -133,7 +133,7 @@ int general_recv(int sock, struct buf *bufp) {
 	return recv_SERVER(sock, bufp);
     }
 
-    printf("Error! general_recv: wrong status %x\n", bufp->status);
+    printf("Error! general_recv: wrong status %d\n", bufp->status);
     exit(-1);
 
     return 1;
@@ -153,7 +153,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
     char *p2 = NULL;
     char tmp[128];
     int cont_len;
-    char *con;
+    char *con, *line;
     
     if ((recv_ret = recv(sock, bufp->buf_tail, bufp->buf_free_size, 0)) == -1) {
 	perror("Error! recv_SERVER, recv");
@@ -183,7 +183,12 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		printf("recv_SERVER: computed length:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n\n\n");
-		    printf("%s", bufp->buf);
+		    
+		    line = strstr(bufp->buf, "\r\n");
+		    memset(tmp, 0, 128);
+		    memcpy(tmp, bufp->buf, line - bufp->buf);
+		    printf("recv_SERVER: %s", tmp);
+		    //printf("%s", bufp->buf);
 		    return 1;
 		}
 	    }

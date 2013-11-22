@@ -77,6 +77,8 @@ int main(int argc, char *argv[]){
     FD_ZERO(&master_read_fds);
     FD_ZERO(&master_write_fds);
     FD_SET(listen_sock, &master_read_fds);
+
+    printf("proxy: listen sock to browser is %d\n", listen_sock);
     
     // server side of proxy: addr
     memset(&server_addr, 0, sizeof(server_addr));
@@ -125,7 +127,7 @@ int main(int argc, char *argv[]){
 		if (i == listen_sock) {
 
 		    printf("proxy: received new connection from browser\n");
-
+		    
 		    if((sock = accept(listen_sock, (struct sockaddr *)&cli_addr, &cli_size)) == -1){
 			perror("Error! proxy, accpet");
 			exit(-1);
