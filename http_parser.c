@@ -157,7 +157,6 @@ int recv_SERVER(int sock, struct buf *bufp) {
     
     assert(bufp->buf_head == bufp->buf_tail);
     if ((recv_ret = recv(sock, bufp->buf_tail, bufp->buf_free_size, 0)) == -1) {
-	printf("%s", bufp->buf_tail);
 	perror("Error! recv_SERVER, recv");
 	exit(-1);
     }
@@ -184,7 +183,8 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
 		printf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
-		    printf("recv_SERVER: fully recvd\n");
+		    printf("recv_SERVER: fully recvd\n\n\n");
+		    printf("%s", bufp->buf_tail);
 		    return 1;
 		}
 	    }
