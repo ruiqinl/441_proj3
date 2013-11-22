@@ -226,7 +226,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	    
 	    int len;
 	    char *close_str = "Connection: close\r\n";
-	    char *alive_str = "Connection: Keep-Alive\r\n";
+	    char *alive_str = "Connection: keep-alive\r\n";
 	    // switch to close
 	    if ((p = strstr(bufp->http_req_p->orig_req, alive_str)) != NULL) {
 		len = p - bufp->http_req_p->orig_req;
