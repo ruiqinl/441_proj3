@@ -83,7 +83,8 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	
     } else if (bufp->status == TO_BROWSER) {
 	printf("general_send: TO_BROWSER, send to sock %d\n", bufp->sock2browser);
-	
+
+	printf("%s\n*********\n", bufp->buf_head);
 	printf("buf_head:%p\n", bufp->buf_head);
 	printf("len:%ld\n", bufp->buf_tail - bufp->buf_head);
 	while ((send_ret = send(bufp->sock2browser, bufp->buf_head, bufp->buf_tail - bufp->buf_head, 0)) > 0) {
