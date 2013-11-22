@@ -110,12 +110,14 @@ int change_rate (struct buf *bufp) {
     return 0;
 }
 
+// return 0 if finish recving
 int recv_SERVER(int sock, struct buf *bufp) {
     assert(bufp != NULL);
 
     int recv_ret;
     size_t recv_size = 0;
 
+    assert(bufp->buf_head == bufp->buf);
     while ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_free_size, 0)) > 0) {
 
 	printf("!!!!!%s\n************\n", bufp->buf_head);
@@ -130,8 +132,12 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	}
 	
     }
+    if (recv_ret == -1) {
+	perror("Error! recv_SERVER, recv");
+	exit(-1);
+    } 
 
-    printf("??????\n%s", bufp->buf);
+    printf("??????\n%s\n#############\n", bufp->buf);
     
     exit(-1);
 }
