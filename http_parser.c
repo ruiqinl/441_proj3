@@ -209,7 +209,7 @@ int recv_BROW(int sock, struct buf *bufp){
 
     if (recv_ret == 1){
 	parse_request(bufp);
-	dbprint_queue(bufp->req_queue_p);
+	//dbprint_queue(bufp->req_queue_p);
 
 	if (bufp->req_queue_p->req_count > 0) {
 	    dequeue_request(bufp); 
