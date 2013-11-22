@@ -118,7 +118,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 
     while ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_free_size, 0)) > 0) {
 
-	printf("!!!!!%s\n", bufp->buf_head);
+	printf("!!!!!%s\n************\n", bufp->buf_head);
 
 	recv_size += recv_ret;
 
