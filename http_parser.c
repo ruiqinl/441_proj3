@@ -110,36 +110,54 @@ int change_rate (struct buf *bufp) {
     return 0;
 }
 
-// return 0 if finish recving
+// return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 int recv_SERVER(int sock, struct buf *bufp) {
     assert(bufp != NULL);
 
     int recv_ret;
-    size_t recv_size = 0;
+    char *p1 = NULL;
+    char *p2 = NULL;
+    char tmp[128];
+    int cont_len;
 
-    assert(bufp->buf_head == bufp->buf);
-    while ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_free_size, 0)) > 0) {
+    if ((recv_ret = recv(sock, bufp->buf_head, bufp->buf_free_size, 0)) == -1) {
+	perror("Error! recv_SERVER, recv");
+	exit(-1);
+    }
 
-	printf("!!!!!%s\n************\n", bufp->buf_head);
-
-	recv_size += recv_ret;
+    if (recv_ret > 0) {
+	printf("recv_SERVER: keep recving\n");
 
 	bufp->buf_head += recv_ret;
-	
-	if (recv_size > SEG_SIZE) {
+	bufp->buf_free_size -= recv_ret;
+	if (bufp->buf_free_size <= 0) {
 	    printf("Error! recv_SERVER, overflow\n");
 	    exit(-1);
 	}
-	
-    }
-    if (recv_ret == -1) {
-	perror("Error! recv_SERVER, recv");
-	exit(-1);
+
+	if((p1 = strstr(bufp->buf, "Content-Length: ")) != NULL
+	   && (p2 = strstr(p1, "\r\n")) != NULL) {
+	    memset(tmp, 0, 128);
+	    memcpy(tmp, p1, p2-p1);
+	    cont_len = atoi(tmp);
+	    printf("recv_SERVER: cont_len:s:%s, d:%d\n", tmp, cont_len);
+
+	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL
+		&& (p2 = strstr(p1+4, "\r\n")) != NULL) {
+		printf("recv_SERVER: recvd cont length:%ld\n", (p2+2) - (p1+4));
+		if ((p2+2) - (p1+4) == cont_len){
+		    printf("recv_SERVER: fully recvd\n");
+		    return 1;
+		}
+	    }
+	}
+    
+	printf("recv_SERVER: not fully recvd, keep recving\n");
+	return 2;
     } 
 
-    printf("??????\n%s\n#############\n", bufp->buf);
-    
-    exit(-1);
+    assert(recv_ret == 0);
+    return 0;
 }
 
 
