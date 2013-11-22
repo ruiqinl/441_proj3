@@ -231,7 +231,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	    if ((p = strstr(bufp->http_req_p->orig_req, alive_str)) != NULL) {
 		len = p - bufp->http_req_p->orig_req;
 		memcpy(new_buf, bufp->http_req_p->orig_req, len);
-		memcpy(new_buf+len, close_str);
+		memcpy(new_buf+len, close_str, strlen(close_str));
 
 		len = strlen(p + strlen(alive_str));
 		memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len);
