@@ -128,9 +128,9 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	
     }
 
-    printf("*****************\n");
+    printf("??????\n%s", bufp->buf);
+    
     exit(-1);
-
 }
 
 
