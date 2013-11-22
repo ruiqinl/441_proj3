@@ -182,12 +182,12 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
 		printf("recv_SERVER: computed length:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
-		    printf("recv_SERVER: fully recvd\n\n\n");
+		    printf("recv_SERVER: fully recvd\n");
 		    
 		    line = strstr(bufp->buf, "\r\n");
 		    memset(tmp, 0, 128);
 		    memcpy(tmp, bufp->buf, line - bufp->buf);
-		    printf("recv_SERVER: %s", tmp);
+		    printf("recv_SERVER: %s\n", tmp);
 		    //printf("%s", bufp->buf);
 		    return 1;
 		}
@@ -209,7 +209,7 @@ int recv_BROW(int sock, struct buf *bufp){
     int recv_ret;
 	
     recv_ret = recv_request(sock, bufp); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
-    printf("===========================================================\n");
+
     printf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
 
     if (recv_ret == 1){

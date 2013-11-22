@@ -194,7 +194,7 @@ int main(int argc, char *argv[]){
  			buf_pts[buf_pts[i]->sock2server]->status = FROM_SERVER;
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 			
-			//reset_buf(buf_pts[i]);
+			reset_buf(buf_pts[i]);
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			reset_buf(buf_pts[i]);
 			//close(i);
