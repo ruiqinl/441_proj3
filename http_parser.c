@@ -133,7 +133,7 @@ int general_recv(int sock, struct buf *bufp) {
 	return recv_SERVER(sock, bufp);
     }
 
-    printf("Error! general_recv: wrong status\n");
+    printf("Error! general_recv: wrong status %x\n", bufp->status);
     exit(-1);
 
     return 1;
