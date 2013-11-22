@@ -216,8 +216,8 @@ int recv_BROW(int sock, struct buf *bufp){
 	    //bufp->status = TO_SERVER;
 	    
 	    // test
-	    bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
-	    bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
+	    //bufp->http_reply_p->orig_req = "GET / HTTP/1.0\r\n\r\n";
+	    //bufp->http_reply_p->orig_cur = bufp->http_reply_p->orig_req;
 	    // test
 		
 	    printf("recv_request: fully recv, change rate if necessary, and send to server\n");
