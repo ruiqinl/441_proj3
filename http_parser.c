@@ -184,7 +184,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		printf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n\n\n");
-		    printf("%s", bufp->buf_tail);
+		    printf("%s", bufp->buf_tail - cont_len);
 		    return 1;
 		}
 	    }
