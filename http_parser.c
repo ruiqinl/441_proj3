@@ -126,7 +126,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
     }
 
     if (recv_ret > 0) {
-	printf("recv_SERVER: keep recving\n");
+	printf("recv_SERVER: recv %d bytes\n", recv_ret);
 
 	bufp->buf_head += recv_ret;
 	bufp->buf_free_size -= recv_ret;
@@ -135,9 +135,11 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    exit(-1);
 	}
 
-	if((p1 = strstr(bufp->buf, "Content-Length: ")) != NULL
+	char *con = "Content-Length: ";
+	if((p1 = strstr(bufp->buf, con)) != NULL
 	   && (p2 = strstr(p1, "\r\n")) != NULL) {
 	    memset(tmp, 0, 128);
+	    p1 += strlen(con);
 	    memcpy(tmp, p1, p2-p1);
 	    cont_len = atoi(tmp);
 	    printf("recv_SERVER: cont_len:s:%s, d:%d\n", tmp, cont_len);
