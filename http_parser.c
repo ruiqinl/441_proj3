@@ -201,7 +201,6 @@ int recv_SERVER(int sock, struct buf *bufp) {
 int recv_BROW(int sock, struct buf *bufp){
 
     int recv_ret;
-    char *p;
 	
     recv_ret = recv_request(sock, bufp); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
     printf("===========================================================\n");

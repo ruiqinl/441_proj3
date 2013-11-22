@@ -22,7 +22,6 @@ int main(int argc, char *argv[]){
     int backlog = 5;
     int sock;
     //char buf[BUF_SIZE];
-    int numbytes;
     struct sockaddr_in cli_addr;
     socklen_t cli_size;
 
