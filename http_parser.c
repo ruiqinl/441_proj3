@@ -224,7 +224,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	    char *p;
 	    char *new_buf = (char *)calloc(2*strlen(bufp->http_req_p->orig_req), sizeof(char));
 	    
-	    int len;
+	    int len, len_left;
 	    char *close_str = "Connection: close\r\n";
 	    char *alive_str = "Connection: keep-alive\r\n";
 
@@ -235,8 +235,8 @@ int recv_BROW(int sock, struct buf *bufp){
 		memcpy(new_buf, bufp->http_req_p->orig_req, len);
 		memcpy(new_buf+len, close_str, strlen(close_str));
 
-		len = strlen(p + strlen(alive_str));
-		memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len);
+		len_left = strlen(p + strlen(alive_str));
+		memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len_left);
 
 		bufp->http_req_p->orig_req = new_buf;
 		printf("??????new_buf:\n%s", bufp->http_req_p->orig_req);
