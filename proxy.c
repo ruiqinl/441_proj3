@@ -156,8 +156,10 @@ int main(int argc, char *argv[]){
 			    buf_pts[i]->status = TO_SERVER;
 			    buf_pts[i]->sock2browser = i;
 			}
-			if (buf_pts[i]->status == FROM_SERVER)
+			if (buf_pts[i]->status == FROM_SERVER) {
+			    printf("!!!!!!len:%ld\n", buf_pts[i]->buf_tail - buf_pts[i]->buf_head);
 			    buf_pts[i]->status = TO_BROWSER;
+			}
 			
 		    } else {
 			assert(recv_ret == 2);
