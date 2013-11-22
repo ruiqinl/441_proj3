@@ -157,7 +157,6 @@ int main(int argc, char *argv[]){
 			    buf_pts[i]->sock2browser = i;
 			}
 			if (buf_pts[i]->status == FROM_SERVER) {
-			    printf("!!!!!!len:%ld\n", buf_pts[i]->buf_tail - buf_pts[i]->buf_head);
 			    buf_pts[i]->status = TO_BROWSER;
 			}
 			
@@ -193,7 +192,7 @@ int main(int argc, char *argv[]){
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
-			general_send(i, buf_pts[i], NULL);
+			close(i);
 		    }
 		    
 		    
