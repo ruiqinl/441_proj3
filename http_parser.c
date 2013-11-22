@@ -154,8 +154,10 @@ int recv_SERVER(int sock, struct buf *bufp) {
     char tmp[128];
     int cont_len;
     char *con;
-
+    
+    assert(bufp->buf_head == bufp->buf_tail);
     if ((recv_ret = recv(sock, bufp->buf_tail, bufp->buf_free_size, 0)) == -1) {
+	printf("%s", bufp->buf_tail);
 	perror("Error! recv_SERVER, recv");
 	exit(-1);
     }
