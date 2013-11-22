@@ -16,92 +16,110 @@
 int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     assert(bufp != NULL);
     
-    
-    int sock2server;
-    size_t numbytes, bytes_sent, bytes_left;
-    char *p1, *p2;
-
-    int send_ret;
 
     if (bufp->status == TO_SERVER) {
 	printf("general_send: TO_SERVER\n");
-
-	assert(server_addr != NULL);
-	assert(bufp->http_reply_p != NULL);
-
-	// server side of proxy: whatever, get f4m first
-	if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-	    perror("Error! general_send, socket, socket2server");
-	    exit(-1);
-	}
-
-	if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(*server_addr)) == -1) {
-	    perror("Error! general_send, connect, socket2server");
-	    exit(-1);
-	}
-	
-	bufp->sock2server = sock2server;
-	
-	// left req to send
-	p1 = bufp->http_reply_p->orig_req;
-	p2 = bufp->http_reply_p->orig_cur;
-	assert(p1 != NULL); 
-	assert(p2 != NULL);
-	assert(p2 >= p1);
-	
-	bytes_sent = p2 - p1;
-	bytes_left = strlen(p2);
-	assert(bytes_left == strlen(p2)); // stupid
-
-	if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
-	    char tmp[128];
-	    inet_ntop(AF_INET, &(server_addr->sin_addr), tmp, 128);
-	    
-	    if (numbytes == strlen(p2)) {
-		// finish sending
-		printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2);
-
-		return 0;
-	    } 
-
-	    // prepare for next sending
-	    p2 += numbytes;
-	    bufp->http_reply_p->orig_cur = p2;
-	    
-	    printf("general_send: TO_SERVER, send %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
-
-	    return 1;
-
-	} else if (numbytes == 0) {
-	    printf("Error!general_send: TO_SERVER, send 0 bytes, this should not happen\n");
-	    exit(-1);
-
-	} else if (numbytes == -1) {
-	    perror("Error! general_send, send\n");
-	    exit(-1);
-	}
-	
+	send_SERVER(sock, bufp, server_addr);
+		
     } else if (bufp->status == TO_BROWSER) {
 	printf("general_send: TO_BROWSER, send to sock %d\n", bufp->sock2browser);
 
-	printf("buf_head:%p\n", bufp->buf_head);
-	printf("len:%ld\n", bufp->buf_tail - bufp->buf_head);
-	while ((send_ret = send(bufp->sock2browser, bufp->buf_head, bufp->buf_tail - bufp->buf_head, 0)) > 0) {
-	    bufp->buf_head += send_ret;
-	}
-	if (send_ret == -1){
-	    perror("Error! general_send, send to brow\n"); 
-	    exit(-1);
-	}
-	if (send_ret == 0) {
-	    printf("general_send: send 0 bytes, finished\n");
-	    return 0;
-	}
-
+	send_BROWSER(sock, bufp, server_addr);
     }
 
     return 0;
 }
+
+// return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status
+int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
+
+    assert(server_addr != NULL);
+    assert(bufp->http_reply_p != NULL);
+
+    int sock2server;
+    size_t numbytes, bytes_sent, bytes_left;
+    char *p1, *p2;
+
+    // server side of proxy: whatever, get f4m first
+    if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+	perror("Error! general_send, socket, socket2server");
+	exit(-1);
+    }
+
+    if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(*server_addr)) == -1) {
+	perror("Error! general_send, connect, socket2server");
+	exit(-1);
+    }
+	
+    bufp->sock2server = sock2server;
+	
+    // left req to send
+    p1 = bufp->http_reply_p->orig_req;
+    p2 = bufp->http_reply_p->orig_cur;
+    assert(p1 != NULL); 
+    assert(p2 != NULL);
+    assert(p2 >= p1);
+	
+    bytes_sent = p2 - p1;
+    bytes_left = strlen(p2);
+    assert(bytes_left == strlen(p2)); // stupid
+
+    if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
+	char tmp[128];
+	inet_ntop(AF_INET, &(server_addr->sin_addr), tmp, 128);
+	    
+	if (numbytes == strlen(p2)) {
+	    // finish sending
+	    printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2);
+
+	    return 0;
+	} 
+
+	// prepare for next sending
+	p2 += numbytes;
+	bufp->http_reply_p->orig_cur = p2;
+	    
+	printf("general_send: TO_SERVER, send %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
+
+	return 1;
+
+    } else if (numbytes == 0) {
+	printf("Error!general_send: TO_SERVER, send 0 bytes, this should not happen\n");
+	exit(-1);
+
+    } else if (numbytes == -1) {
+	perror("Error! general_send, TO_SERVER, send\n");
+	exit(-1);
+    }
+    
+    return 0;
+
+}
+
+// return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status
+int send_BROWSER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
+    assert(bufp != NULL);
+
+    int send_ret;
+    
+    printf("send_BROWSER: len:%ld\n", bufp->buf_tail - bufp->buf_head);
+    while ((send_ret = send(bufp->sock2browser, bufp->buf_head, bufp->buf_tail - bufp->buf_head, 0)) > 0) {
+	bufp->buf_head += send_ret;
+	printf("send_BROWSER: send %d bytes\n", send_ret);
+    }
+    if (send_ret == -1){
+	perror("Error! general_send, send to brow\n"); 
+	exit(-1);
+    }
+    if (send_ret == 0) {
+	printf("send_BROWSER: send 0 bytes\n");
+	return 0;
+    }
+
+    return 0;
+
+}
+
 
 // return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 int general_recv(int sock, struct buf *bufp) {

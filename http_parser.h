@@ -17,5 +17,7 @@ int change_rate (struct buf *bufp);
 int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr);
 
 int recv_SERVER(int sock, struct buf *bufp);
+int send_BROWSER(int sock, struct buf *bufp, struct sockaddr_in *server_addr);
+int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr);
 
 #endif
