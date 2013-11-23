@@ -61,7 +61,7 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, cha
 	perror("Error! proxy, bind\n");
 	exit(-1);
     }
-    printf("send_SERVER: bind to fake ip:%s\n", fake_ip);
+    dbprintf("send_SERVER: bind to fake ip:%s\n", fake_ip);
     
     // connect
     if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(*server_addr)) == -1) {
@@ -194,7 +194,7 @@ int change_rate (struct buf *bufp) {
 	new_rate = *p;
     }
 
-    dbprintf("change from rate %s to %d\n", bitrate, new_rate);
+    printf("change from rate %s to %d\n", bitrate, new_rate);
     bufp->bitrate = new_rate;
 
     // modify req
