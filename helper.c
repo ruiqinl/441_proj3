@@ -11,7 +11,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <time.h>
-#include <cmath.h>
+
 
 #include "helper.h"
 #include "http_replyer.h"
@@ -623,7 +623,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
 
     // tput
     tput = bufp->Bsize / duration; 
-    tput = floor(tput) * 8;
+    tput = (tput) * 8;
     printf("logging: tput %f bits\n", tput);
     if (avg_tput == 0.0) 
 	avg_tput = tput;
