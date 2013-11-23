@@ -165,7 +165,7 @@ int change_rate (struct buf *bufp) {
 
     int *p = all_rates;
     printf("???????*p:%d\n", *p);
-    while ( *p != 0 && (*p * 8) < (avg_tput/1.5))
+    while ( *p != 0 && (*p * 1000) < (avg_tput/1.5/8))
 	p++;
     
     if (*p == 0) {
