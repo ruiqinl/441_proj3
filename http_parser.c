@@ -170,6 +170,11 @@ int log_chunkname(struct buf *bufp) {
     char *tag = "/vod";
     
     p1 = strstr(bufp->http_req_p->orig_req, tag);
+    if (p1 == NULL) {
+	printf("log_chunkname: not for chunk, no need\n");
+	return 0;
+    }
+
     assert(p1 != NULL);
     
     p2 = strchr(p1, ' ');
