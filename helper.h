@@ -178,12 +178,12 @@ struct buf {
     int sock2server;
     int sock2browser;
 
-    time_t ts;
-    time_t tf;
-    size_t Bsize;
-    long bitrate;
+    time_t ts; // done in recv_BROW
+    time_t tf; // done in recv_SERVER
+    size_t Bsize; // done in recv_SERVER
+    char *bitrate; // done in change_bitrate
     char *client_ip;// done in init_buf
-    char *chunk_name; //
+    char *chunk_name; // done in log_chunkname
 
 };
 

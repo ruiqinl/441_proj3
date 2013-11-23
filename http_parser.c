@@ -142,14 +142,37 @@ int general_recv(int sock, struct buf *bufp) {
 int change_rate (struct buf *bufp) {
     assert(bufp != NULL);
 
+    char *p1, *p2;
+    
+    bufp->bitrate = (char *)calloc(128, sizeof(char));
 
+    p1 = strstr(bufp->buf, "/vod/");
+    p2 = strstr(bufp->buf, "Seg");
+    assert(p1 != NULL);
+    assert(p2 != NULL);
+
+    p1 += strlen("/vod/");
+    memcpy(bufp->bitrate, p1, p2-p1);
+    printf("change_rate: not changed yet, remain %s\n", bufp->bitrate);
+    
     return 0;
 }
 
 int log_chunkname(struct buf *bufp) {
     assert(bufp != NULL);
 
-    //bufp->http_req_p->orig_req    
+    char *p1, *p2;
+    char *tag = "/vod";
+    
+    p1 = strstr(bufp->http_req_p->orig_req, tag);
+    assert(p1 != NULL);
+    
+    p2 = strchr(p1, ' ');
+    assert(p2 != NULL);
+
+    bufp->chunk_name = (char *)calloc(256, sizeof(char));
+    memcpy(bufp->chunk_name, p1, p2-p1);
+
     return 0;
 }
 
@@ -266,12 +289,13 @@ int recv_BROW(int sock, struct buf *bufp){
 	    	*(p+4) = '\0';
 	    }
 
+
 	    //test
-	    static int count = 0;
+	    /*static int count = 0;
 	    if (++count == 10){
 		printf("??????\n%s\n???????\n", bufp->http_req_p->orig_req);
 		exit(-1);
-	    }
+		}*/
 	    
 
 	    return 1;

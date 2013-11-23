@@ -42,9 +42,6 @@ int main(int argc, char *argv[]){
     struct buf* buf_pts[MAX_SOCK];
     int i, recv_ret, send_ret;
     
-    double throughput = 0.0;
-    double time_diff = 0.0;
-    double tmp_throughput = 0.0;
     
     double alpha;
     char *log = NULL;

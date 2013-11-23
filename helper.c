@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
+#include <time.h>
 
 #include "helper.h"
 #include "http_replyer.h"
@@ -582,14 +583,14 @@ int *parsef4m(char *buf) {
 }
 
 
-/*
+
 int logging(struct buf *bufp, double alpha, char *log) {
     assert(bufp != NULL);
     assert(log != NULL);
 
     assert(bufp->ts != 0);
     assert(bufp->tf != 0);
-    assert(bufp->tf >= buf->ts);
+    assert(bufp->tf >= bufp->ts);
     
     char line[1024];
     time_t cur_time;
@@ -603,24 +604,29 @@ int logging(struct buf *bufp, double alpha, char *log) {
     time(&cur_time);
     
     // duration
-    duration = difftime(buf->tf, buf->ts);
+    duration = difftime(bufp->tf, bufp->ts);
+    printf("logging: duration %f = %ld - %ld\n", duration, bufp->tf, bufp->ts);
     
     if (duration == 0) 
 	return 0;
 
     // tput
-    tput = bufp->Bsize / duration; 
+    tput = bufp->Bsize / (double)duration; 
+    printf("logging: tput %f\n", tput);
     if (avg_tput == 0.0) 
 	avg_tput = tput;
     else 
 	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
     
     // bitrate, just bufp->bitrate
+    printf("logging: bitrate %s\n", bufp->bitrate);
     // client_ip, just bufp->client_ip
+    printf("logging: clent_ip %s\n", bufp->client_ip);
     // chunk_name, just bufp->chunkname
-    
+    printf("logging: chunk_name %s\n", bufp->chunk_name);
 
+    return 0;
     
 
 }
-*/
+
