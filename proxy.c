@@ -45,7 +45,6 @@ int main(int argc, char *argv[]){
     
     double alpha;
     char *log = NULL;
-    double avg_tput = 0.0;
     
     // parse argv
     if (argc < 8) {
@@ -207,7 +206,7 @@ int main(int argc, char *argv[]){
 			close(i);
 			
 			// throughput
-			logging(buf_pts[i], alpha, log, avg_tput);
+			logging(buf_pts[i], alpha, log);
 						
 		    }
 		    

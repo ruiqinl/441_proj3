@@ -221,6 +221,6 @@ void logprint(const char *log_file, const char *s);
 // for proj3
 int *getf4m(int sock);
 int *parsef4m(char *buf);
-int logging(struct buf *bufp, double alpha, char *log, double avg_tput);
+int logging(struct buf *bufp, double alpha, char *log);
 
 #endif
