@@ -144,8 +144,8 @@ int change_rate (struct buf *bufp) {
     assert(bufp != NULL);
 
     char *p1, *p2;
-    
     char *bitrate = (char *)calloc(128, sizeof(char));
+    int new_rate;
 
     p1 = strstr(bufp->rbuf, "/vod/");
     p2 = strstr(bufp->rbuf, "Seg");
@@ -171,28 +171,31 @@ int change_rate (struct buf *bufp) {
     }
     
     if (*p == 0) {
-	printf("change_rate: impossible, avg_tput/1.5/8 is %f\n", avg_tput/1.5/8);
-	exit(-1);
+	//printf("change_rate: impossible, avg_tput/1.5/8 is %f\n", avg_tput/1.5/8);
+	new_rate = *(p-1);
     } else {
-	printf("change from rate %s to %d\n", bitrate, *p);
-	bufp->bitrate = *p;
-
-	// modify req
-	char *tmp = (char *)calloc(2*strlen(bufp->rbuf), sizeof(char));
-	memcpy(tmp, bufp->rbuf, p1 - bufp->rbuf);
-	
-	char tmp2[128];
-	memset(tmp2, 0, 128);
-	sprintf(tmp2, "%d", *p);
-
-	memcpy(tmp + (p1 - bufp->rbuf), tmp2, strlen(tmp2));
-	memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
-	printf("??????\n%s\n???????\n", tmp);
-
-	static int count = 0;
-	if (++count == 3)
-	    exit(-1);
+	new_rate = *p;
     }
+
+    printf("change from rate %s to %d\n", bitrate, new_rate);
+    bufp->bitrate = new_rate;
+
+    // modify req
+    char *tmp = (char *)calloc(2*strlen(bufp->rbuf), sizeof(char));
+    memcpy(tmp, bufp->rbuf, p1 - bufp->rbuf);
+	
+    char tmp2[128];
+    memset(tmp2, 0, 128);
+    sprintf(tmp2, "%d", *p);
+
+    memcpy(tmp + (p1 - bufp->rbuf), tmp2, strlen(tmp2));
+    memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
+    printf("??????\n%s\n???????\n", tmp);
+
+    static int count = 0;
+    if (++count == 3)
+	exit(-1);
+
 
     return 0;
 }
