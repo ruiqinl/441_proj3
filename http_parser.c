@@ -174,16 +174,17 @@ int change_rate (struct buf *bufp) {
     assert(p1 != NULL);
     assert(p2 != NULL);
 
-    if (avg_tput == 0.0) {
-	printf("change: avg_tput is 0.0, first packet, do not change rate\n");
-	return 0;
-    }
-
     p1 += strlen("/vod/");
     memcpy(bitrate, p1, p2-p1);
     //bufp->bitrate = atoi(bitrate);
 
     //printf("change_rate: not changed yet, remain %s\n", bufp->bitrate);
+    if (avg_tput == 0.0) {
+	printf("change: avg_tput is 0.0, first packet, do not change rate %s\n", bitrate);
+	bufp->bitrate = atoi(bitrate);
+	return 0;
+    }
+
 
     int *p = all_rates;
 
@@ -363,6 +364,9 @@ int recv_BROW(int sock, struct buf *bufp){
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';
 	    }
+
+	    // final pack
+	    printf("??????\n%s\n??????\n", bufp->http_req_p->orig_req);
 
 	    return 1;
 	} else  {
