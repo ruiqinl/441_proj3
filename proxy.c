@@ -64,7 +64,7 @@ int main(int argc, char *argv[]){
     dns_port = atoi(argv[6]);
     www_ip = argv[7];
 
-    dbprintf("alpha:%f\n", alpha);
+    printf("alpha:%f\n", alpha);
 
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -113,10 +113,10 @@ int main(int argc, char *argv[]){
     all_rates = getf4m(sock2server);
     tmp_p = all_rates;
     while (*tmp_p != 0)
-	dbprintf("%d  ", *(tmp_p++));
+	printf("%d  ", *(tmp_p++));
 
     close(sock2server);
-    dbprintf("proxy: got f4m\n");
+    printf("proxy: got f4m\n");
 
     // receive connection from browser
     
