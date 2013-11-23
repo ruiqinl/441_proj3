@@ -207,7 +207,7 @@ int change_rate (struct buf *bufp) {
 
     memcpy(tmp + (p1 - bufp->rbuf), tmp2, strlen(tmp2));
     memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
-    dbprintf("??????\n%s\n???????\n", tmp);
+    //    dbprintf("??????\n%s\n???????\n", tmp);
 
     free(bufp->http_reply_p->orig_req);
     bufp->http_reply_p->orig_req = tmp;
