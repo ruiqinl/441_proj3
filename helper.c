@@ -614,25 +614,26 @@ int logging(struct buf *bufp, double alpha, char *log) {
     // duration
     assert(bufp->tf > bufp->ts);
     duration = bufp->tf - bufp->ts;
-    dbprintf("logging: duration %f = %f - %f\n", duration, bufp->tf, bufp->ts);
+    //dbprintf("logging: duration %f = %f - %f\n", duration, bufp->tf, bufp->ts);
 
     assert(duration != 0.0);
 
     // tput
     tput = bufp->Bsize / duration; 
     tput = (tput) * 8 / 1000;
-    dbprintf("logging: tput %f bits\n", tput);
+    printf("proxy logging: tput %f Kbps\n", tput);
     if (avg_tput == 0.0) 
 	avg_tput = tput;
     else 
 	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
     
     // bitrate, just bufp->bitrate
-    dbprintf("logging: bitrate %d\n", bufp->bitrate);
+    printf("proxy logging: bitrate %d \n", bufp->bitrate);
+    printf("proxy logging: tput:%f, avg_tput:%f\n", tput, avg_tput);
     // client_ip, just bufp->client_ip
-    dbprintf("logging: clent_ip %s\n", bufp->client_ip);
+    //dbprintf("proxy logging: clent_ip %s\n", bufp->client_ip);
     // chunk_name, just bufp->chunkname
-    dbprintf("logging: chunk_name %s\n", bufp->chunk_name);
+    dbprintf("proxy logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
     sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
