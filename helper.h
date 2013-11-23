@@ -113,6 +113,8 @@ struct req_queue {
 
 #define SEG_SIZE 4*1024*1024 // 4m
 
+extern double avg_tput;
+
 struct buf {
 
     int is_cgi_req;

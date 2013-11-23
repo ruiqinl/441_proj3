@@ -597,7 +597,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     time_t cur_time;
     double duration;
     double tput;
-    static double avg_tput = 0.0;
+    //static double avg_tput = 0.0;
 
     FILE *fp = NULL;
 

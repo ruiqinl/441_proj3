@@ -14,6 +14,7 @@
 #include "http_replyer.h"
 #include "http_parser.h"
 
+double avg_tput = 0.0;
 
 int main(int argc, char *argv[]){
 
