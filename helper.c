@@ -623,7 +623,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
 
     // tput
     tput = bufp->Bsize / duration; 
-    tput = round(tput) * 8;
+    tput = floor(tput) * 8;
     printf("logging: tput %f bits\n", tput);
     if (avg_tput == 0.0) 
 	avg_tput = tput;
