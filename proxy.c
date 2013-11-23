@@ -115,6 +115,7 @@ int main(int argc, char *argv[]){
     while (*tmp_p != 0)
 	dbprintf("%d  ", *(tmp_p++));
 
+    printf("????\n");
     close(sock2server);
     dbprintf("proxy: got f4m\n");
 
