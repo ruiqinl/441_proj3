@@ -47,13 +47,15 @@ int main(int argc, char *argv[]){
     double tmp_throughput = 0.0;
     
     double alpha;
+    char *log = NULL;
     
     // parse argv
     if (argc < 8) {
 	printf("Usage: ./proxy <log> <alpha> <listen_port> <fake-ip> <dns-ip> <dns-port> <www-ip>\n");
 	return -1;
     }
-    
+
+    log = argv[1];
     alpha = atof(argv[2]);
     listen_port = atoi(argv[3]);
     fake_ip = argv[4];
@@ -142,6 +144,7 @@ int main(int argc, char *argv[]){
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
 		    printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);
 
+
 		    // track maxfd 
 		    if (sock > maxfd)
 			maxfd = sock;
@@ -191,7 +194,7 @@ int main(int argc, char *argv[]){
 			if (buf_pts[i]->sock2server > maxfd)
 			    maxfd = buf_pts[i]->sock2server;
 			
-			// init buf
+			// transfer info
 			buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
 			init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
 
@@ -199,25 +202,14 @@ int main(int argc, char *argv[]){
  			buf_pts[buf_pts[i]->sock2server]->status = FROM_SERVER;
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 			buf_pts[buf_pts[i]->sock2server]->ts = buf_pts[i]->ts;
+			buf_pts[buf_pts[i]->sock2server]->client_ip = buf_pts[i]->client_ip;
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			close(i);
 			
 			// throughput
-			assert(buf_pts[i]->ts != 0);
-			assert(buf_pts[i]->tf != 0);
-			assert(buf_pts[i]->tf >= buf_pts[i]->ts);
-
-			time_diff = difftime(buf_pts[i]->tf, buf_pts[i]->ts);
-			if (time_diff != 0) {
-			    tmp_throughput = buf_pts[i]->Bsize / time_diff; 
-			    if (throughput == 0.0) {
-				throughput = tmp_throughput;
-			    } else {
-				throughput = alpha * throughput + (1 - alpha) * tmp_throughput;
-			    }
-			    printf("proxy: time_diff:%f, thru:%f\n", time_diff, throughput);
-			}
+			//logging(buf_pts[i], alpha, log);
+			
 			
 			
 		    }

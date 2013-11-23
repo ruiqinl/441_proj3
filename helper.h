@@ -181,6 +181,9 @@ struct buf {
     time_t ts;
     time_t tf;
     size_t Bsize;
+    long bitrate;
+    char *client_ip;// done in init_buf
+    char *chunk_name; //
 
 };
 

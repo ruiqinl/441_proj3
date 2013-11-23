@@ -140,9 +140,16 @@ int general_recv(int sock, struct buf *bufp) {
 }
 
 int change_rate (struct buf *bufp) {
-    
+    assert(bufp != NULL);
 
 
+    return 0;
+}
+
+int log_chunkname(struct buf *bufp) {
+    assert(bufp != NULL);
+
+    //bufp->http_req_p->orig_req    
     return 0;
 }
 
@@ -193,7 +200,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		    // size
 		    bufp->Bsize = strlen(bufp->buf);
 		    printf("recv_SERVER: Bsize:%ld\n", bufp->Bsize);
-		    
+
 		    return 1;
 		}
 	    }
@@ -229,7 +236,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	if (bufp->req_queue_p->req_count > 0) {
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
-	    
+	    log_chunkname(bufp);
 		
 	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 	    
@@ -258,6 +265,14 @@ int recv_BROW(int sock, struct buf *bufp){
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';
 	    }
+
+	    //test
+	    static int count = 0;
+	    if (++count == 4){
+		printf("??????\n%s\n???????\n", bufp->http_req_p->orig_req);
+		exit(-1);
+	    }
+	    
 
 	    return 1;
 	} else  {

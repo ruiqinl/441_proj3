@@ -134,6 +134,12 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->ts = 0;
     bufp->tf = 0;
     bufp->Bsize = 0;
+    bufp->bitrate = 0;
+    bufp->client_ip = (char *)calloc(128, sizeof(char));
+    bufp->chunk_name = NULL;
+
+    // clietn_ip
+    inet_ntop(AF_INET, &(cli_addr->sin_addr), bufp->client_ip, INET_ADDRSTRLEN);
 }
 
 
@@ -574,3 +580,47 @@ int *parsef4m(char *buf) {
     
     return rate;
 }
+
+
+/*
+int logging(struct buf *bufp, double alpha, char *log) {
+    assert(bufp != NULL);
+    assert(log != NULL);
+
+    assert(bufp->ts != 0);
+    assert(bufp->tf != 0);
+    assert(bufp->tf >= buf->ts);
+    
+    char line[1024];
+    time_t cur_time;
+    double duration;
+    double tput;
+    double avg_tput;
+
+    memset(line, 0, 1024);
+
+    // time
+    time(&cur_time);
+    
+    // duration
+    duration = difftime(buf->tf, buf->ts);
+    
+    if (duration == 0) 
+	return 0;
+
+    // tput
+    tput = bufp->Bsize / duration; 
+    if (avg_tput == 0.0) 
+	avg_tput = tput;
+    else 
+	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
+    
+    // bitrate, just bufp->bitrate
+    // client_ip, just bufp->client_ip
+    // chunk_name, just bufp->chunkname
+    
+
+    
+
+}
+*/
