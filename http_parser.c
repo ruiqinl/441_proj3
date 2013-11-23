@@ -146,11 +146,11 @@ int change_rate (struct buf *bufp) {
     
     bufp->bitrate = (char *)calloc(128, sizeof(char));
 
-    printf("??????rbuf:%s\n", bufp->rbuf);
+    //printf("??????rbuf:%s\n", bufp->rbuf);
     p1 = strstr(bufp->rbuf, "/vod/");
-    p2 = strstr(bufp->buf, "Seg");
+    p2 = strstr(bufp->rbuf, "Seg");
 
-    if (p1 == NULL) {
+    if (p2 == NULL) {
 	printf("change_rate: not for chunk, no need\n");
 	return 0;
     }
@@ -168,7 +168,7 @@ int log_chunkname(struct buf *bufp) {
     assert(bufp != NULL);
 
     char *p1, *p2;
-    char *tag = "/vod";
+    char *tag = "Seg";
     
     p1 = strstr(bufp->http_req_p->orig_req, tag);
     if (p1 == NULL) {
@@ -176,9 +176,9 @@ int log_chunkname(struct buf *bufp) {
 	return 0;
     }
 
+    p1 = strstr(bufp->http_req_p->orig_req, "/vod/");
     assert(p1 != NULL);
-    
-    p2 = strchr(p1, ' ');
+    p2 = strchr(p2, ' ');
     assert(p2 != NULL);
 
     bufp->chunk_name = (char *)calloc(256, sizeof(char));
