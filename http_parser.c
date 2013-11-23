@@ -178,7 +178,7 @@ int log_chunkname(struct buf *bufp) {
 
     p1 = strstr(bufp->http_req_p->orig_req, "/vod/");
     assert(p1 != NULL);
-    p2 = strchr(p2, ' ');
+    p2 = strchr(p1, ' ');
     assert(p2 != NULL);
 
     bufp->chunk_name = (char *)calloc(256, sizeof(char));
