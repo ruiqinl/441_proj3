@@ -159,7 +159,7 @@ int main(int argc, char *argv[]){
 			perror("Error! proxy, fake_addr, inet_aton\n");
 			exit(-1);
 		    }
-		    fake_addr.sin_port = htons(7777);
+		    fake_addr.sin_port = htons(0);
 		    
 		    if (bind(sock, (struct sockaddr *)&fake_addr, sizeof(fake_addr)) == -1) {
 			perror("Error! proxy, bind\n");
