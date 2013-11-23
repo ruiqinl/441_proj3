@@ -183,15 +183,15 @@ int change_rate (struct buf *bufp) {
     int *p = all_rates;
 
     while ( *p != 0 && (*p) < (avg_tput/1.5)){
-	dbprintf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
+	printf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
 	p++;
     }
     
-    if (*p == 0) {
+    if (p == all_rates) {
 	//printf("change_rate: impossible, avg_tput/1.5/8 is %f\n", avg_tput/1.5/8);
-	new_rate = *(p-1);
-    } else {
 	new_rate = *p;
+    } else {
+	new_rate = *(p-1);
     }
 
     printf("change from rate %s to %d\n", bitrate, new_rate);

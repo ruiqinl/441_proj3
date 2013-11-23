@@ -629,7 +629,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     
     // bitrate, just bufp->bitrate
     printf("proxy logging: bitrate %d \n", bufp->bitrate);
-    printf("proxy logging: tput:%f, avg_tput:%f\n", tput, avg_tput);
+    printf("proxy logging: tput:%f, new avg_tput:%f\n", tput, avg_tput);
     // client_ip, just bufp->client_ip
     //dbprintf("proxy logging: clent_ip %s\n", bufp->client_ip);
     // chunk_name, just bufp->chunkname
