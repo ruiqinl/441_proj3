@@ -188,7 +188,7 @@ int change_rate (struct buf *bufp) {
 
     int *p = all_rates;
 
-    while ( *p != 0 && (*p) < (avg_tput/1.5)){
+    while ( *p != 0 && (*p) <= (avg_tput/1.5)){
 	printf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
 	p++;
     }
@@ -335,10 +335,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	if (bufp->req_queue_p->req_count > 0) {
 	    dbprintf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 
-	    
-
 	    dequeue_request(bufp); 
-	    printf("!!!\n%s\n!!!", bufp->http_req_p->orig_req);
 	    change_rate(bufp);
 	    log_chunkname(bufp);	       	    
 	    
@@ -368,8 +365,6 @@ int recv_BROW(int sock, struct buf *bufp){
 	    	*(p+4) = '\0';
 	    }
 
-	    // final pack
-	    printf("??????\n%s\n??????\n", bufp->http_req_p->orig_req);
 
 	    return 1;
 	} else  {
