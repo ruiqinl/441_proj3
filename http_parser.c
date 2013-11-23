@@ -164,7 +164,7 @@ int change_rate (struct buf *bufp) {
     //printf("change_rate: not changed yet, remain %s\n", bufp->bitrate);
 
     int *p = all_rates;
-    while ( *p != 0 && *p < (avg_tput/1.5))
+    while ( *p != 0 && (*p * 8) < (avg_tput/1.5))
 	p++;
     
     if (*p == 0) {
