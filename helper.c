@@ -585,7 +585,7 @@ int *parsef4m(char *buf) {
 
 
 
-int logging(struct buf *bufp, double alpha, char *log) {
+int logging(struct buf *bufp, double alpha, char *log, double avg_tput) {
     assert(bufp != NULL);
     assert(log != NULL);
 
@@ -597,7 +597,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     time_t cur_time;
     double duration;
     double tput;
-    double avg_tput;
+    //double avg_tput;
 
     FILE *fp = NULL;
 
