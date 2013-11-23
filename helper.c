@@ -598,6 +598,11 @@ int logging(struct buf *bufp, double alpha, char *log) {
     double tput;
     double avg_tput;
 
+    FILE *fp = NULL;
+
+    fp = fopen(log, "a");
+    assert(fp != NULL);
+
     memset(line, 0, 1024);
 
     // time
@@ -633,6 +638,13 @@ int logging(struct buf *bufp, double alpha, char *log) {
     printf("logging: clent_ip %s\n", bufp->client_ip);
     // chunk_name, just bufp->chunkname
     printf("logging: chunk_name %s\n", bufp->chunk_name);
+
+    // log
+    sprintf(line, "%ld %f %f %f %s %s %s", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+
+    fputs(line, fp);
+
+    fclose(fp);
 
     return 0;
     
