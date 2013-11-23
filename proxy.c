@@ -47,6 +47,7 @@ int main(int argc, char *argv[]){
     
     double alpha;
     char *log = NULL;
+    int *tmp_p = NULL;
     //int *all_rates = NULL;
     
     // parse argv
@@ -107,10 +108,12 @@ int main(int argc, char *argv[]){
 	perror("Error! main, connect, socket2server");
 	exit(-1);
     }
+
     
     all_rates = getf4m(sock2server);
-    while (*all_rates != 0)
-	printf("%d  ", *(all_rates++));
+    tmp_p = all_rates;
+    while (*tmp_p != 0)
+	printf("%d  ", *(tmp_p++));
 
     close(sock2server);
     printf("proxy: got f4m\n");
