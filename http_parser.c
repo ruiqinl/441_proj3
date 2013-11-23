@@ -186,7 +186,10 @@ int change_rate (struct buf *bufp) {
 	memcpy(tmp + (p1 - bufp->rbuf), tmp2, strlen(tmp2));
 	memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
 	printf("??????\n%s\n???????\n", tmp);
-	exit(-1);
+
+	static int count = 0;
+	if (++count == 3)
+	    exit(-1);
     }
 
     return 0;
