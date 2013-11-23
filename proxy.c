@@ -115,7 +115,6 @@ int main(int argc, char *argv[]){
     while (*tmp_p != 0)
 	dbprintf("%d  ", *(tmp_p++));
 
-    printf("????\n");
     close(sock2server);
     dbprintf("proxy: got f4m\n");
 
@@ -139,7 +138,7 @@ int main(int argc, char *argv[]){
 		
 		if (i == listen_sock) {
 
-		    dbprintf("proxy: received new connection from browser\n");
+		    printf("proxy: received new connection from browser\n");
 
 		    if((sock = accept(listen_sock, (struct sockaddr *)&cli_addr, &cli_size)) == -1){
 			perror("Error! proxy, accpet");
@@ -149,7 +148,7 @@ int main(int argc, char *argv[]){
 		    FD_SET(sock, &master_read_fds);
 		    buf_pts[sock] = (struct buf*)calloc(1, sizeof(struct buf));
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
-		    dbprintf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);
+		    printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);
 
 
 		    // track maxfd 
@@ -158,7 +157,7 @@ int main(int argc, char *argv[]){
 
 		} else {
 		    
-		    dbprintf("proxy: received bytes from browser/server\n");
+		    printf("proxy: received bytes from browser/server\n");
 		    
 		    // return 1 if fully received a request, return 0 if no bytes received, 2 if partially received
 		    if ((recv_ret = general_recv(i, buf_pts[i])) == 0) {
@@ -188,7 +187,7 @@ int main(int argc, char *argv[]){
 
 	    // check write_fds
 	    if (FD_ISSET(i, &write_fds)) {
-		dbprintf("proxy: write bytes to browser/server\n");
+		printf("proxy: write bytes to browser/server\n");
 		
 		// return 1 if send some bytes, return 0 if finish sending
 		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0) {
