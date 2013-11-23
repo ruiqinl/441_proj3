@@ -19,11 +19,11 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     
 
     if (bufp->status == TO_SERVER) {
-	printf("general_send: TO_SERVER\n");
+	dbprintf("general_send: TO_SERVER\n");
 	send_SERVER(sock, bufp, server_addr);
 		
     } else if (bufp->status == TO_BROWSER) {
-	printf("general_send: TO_BROWSER, send to sock %d\n", bufp->sock2browser);
+	dbprintf("general_send: TO_BROWSER, send to sock %d\n", bufp->sock2browser);
 
 	send_BROWSER(sock, bufp, server_addr);
     }
@@ -71,7 +71,7 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	    
 	if (numbytes == strlen(p2)) {
 	    // finish sending
-	    printf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2);
+	    dbprintf("general_send: TO_SERVER, finished sending %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2);
 
 	    return 0;
 	} 
@@ -80,12 +80,12 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 	p2 += numbytes;
 	bufp->http_reply_p->orig_cur = p2;
 	    
-	printf("general_send: TO_SERVER, send %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
+	dbprintf("general_send: TO_SERVER, send %ld bytes to server %s:%d:\n%s", numbytes, tmp, ntohs(server_addr->sin_port), p2-numbytes);
 
 	return 1;
 
     } else if (numbytes == 0) {
-	printf("Error!general_send: TO_SERVER, send 0 bytes, this should not happen\n");
+	dbprintf("Error!general_send: TO_SERVER, send 0 bytes, this should not happen\n");
 	exit(-1);
 
     } else if (numbytes == -1) {
@@ -103,17 +103,17 @@ int send_BROWSER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 
     int send_ret;
     
-    printf("send_BROWSER: len:%ld\n", bufp->buf_tail - bufp->buf_head);
+    dbprintf("send_BROWSER: len:%ld\n", bufp->buf_tail - bufp->buf_head);
     while ((send_ret = send(bufp->sock2browser, bufp->buf_head, bufp->buf_tail - bufp->buf_head, 0)) > 0) {
 	bufp->buf_head += send_ret;
-	printf("send_BROWSER: send %d bytes\n", send_ret);
+	dbprintf("send_BROWSER: send %d bytes\n", send_ret);
     }
     if (send_ret == -1){
 	perror("Error! general_send, send to brow\n"); 
 	exit(-1);
     }
     if (send_ret == 0) {
-	printf("send_BROWSER: send 0 bytes\n");
+	dbprintf("send_BROWSER: send 0 bytes\n");
 	return 0;
     }
 
@@ -127,14 +127,14 @@ int general_recv(int sock, struct buf *bufp) {
     assert(bufp != NULL);
 
     if (bufp->status == RAW || bufp->status == FROM_BROWSER) {
-	printf("general_recv: RAW/FROM_BROWSER, call recv_BROW\n");
+	dbprintf("general_recv: RAW/FROM_BROWSER, call recv_BROW\n");
 	return recv_BROW(sock, bufp);
     } else if (bufp->status == FROM_SERVER) {
-	printf("general_recv: FROM_SERVER, call recv_SERVER\n");
+	dbprintf("general_recv: FROM_SERVER, call recv_SERVER\n");
 	return recv_SERVER(sock, bufp);
     }
 
-    printf("Error! general_recv: wrong status\n");
+    dbprintf("Error! general_recv: wrong status\n");
     exit(-1);
 
     return 1;
@@ -151,7 +151,7 @@ int change_rate (struct buf *bufp) {
     p2 = strstr(bufp->rbuf, "Seg");
 
     if (p2 == NULL) {
-	printf("change_rate: not for chunk, no need\n");
+	dbprintf("change_rate: not for chunk, no need\n");
 	return 0;
     }
     assert(p1 != NULL);
@@ -166,7 +166,7 @@ int change_rate (struct buf *bufp) {
     int *p = all_rates;
 
     while ( *p != 0 && (*p * 1000) < (avg_tput/1.5/8)){
-	printf("change_rate: %d ? %f\n", (*p * 1000), (avg_tput/1.5/8));
+	dbprintf("change_rate: %d ? %f\n", (*p * 1000), (avg_tput/1.5/8));
 	p++;
     }
     
@@ -177,7 +177,7 @@ int change_rate (struct buf *bufp) {
 	new_rate = *p;
     }
 
-    printf("change from rate %s to %d\n", bitrate, new_rate);
+    dbprintf("change from rate %s to %d\n", bitrate, new_rate);
     bufp->bitrate = new_rate;
 
     // modify req
@@ -190,7 +190,7 @@ int change_rate (struct buf *bufp) {
 
     memcpy(tmp + (p1 - bufp->rbuf), tmp2, strlen(tmp2));
     memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
-    printf("??????\n%s\n???????\n", tmp);
+    dbprintf("??????\n%s\n???????\n", tmp);
 
     free(bufp->http_reply_p->orig_req);
     bufp->http_reply_p->orig_req = tmp;
@@ -207,7 +207,7 @@ int log_chunkname(struct buf *bufp) {
     
     p1 = strstr(bufp->http_req_p->orig_req, tag);
     if (p1 == NULL) {
-	printf("log_chunkname: not for chunk, no need\n");
+	dbprintf("log_chunkname: not for chunk, no need\n");
 	return 0;
     }
 
@@ -239,12 +239,12 @@ int recv_SERVER(int sock, struct buf *bufp) {
     }
 
     if (recv_ret > 0) {
-	printf("recv_SERVER: recv %d bytes\n", recv_ret);
+	dbprintf("recv_SERVER: recv %d bytes\n", recv_ret);
 
 	bufp->buf_tail += recv_ret;
 	bufp->buf_free_size -= recv_ret;
 	if (bufp->buf_free_size <= 0) {
-	    printf("Error! recv_SERVER, overflow\n");
+	    dbprintf("Error! recv_SERVER, overflow\n");
 	    exit(-1);
 	}
 
@@ -255,10 +255,10 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    p1 += strlen(con);
 	    memcpy(tmp, p1, p2-p1);
 	    cont_len = atoi(tmp);
-	    printf("recv_SERVER: Content-Lneght:s:%s, d:%d\n", tmp, cont_len);
+	    dbprintf("recv_SERVER: Content-Lneght:s:%s, d:%d\n", tmp, cont_len);
 
 	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
-		printf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
+		dbprintf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
 		    printf("recv_SERVER: fully recvd\n");
 
@@ -268,18 +268,18 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		    gettimeofday(&tim, NULL);
 		    bufp->tf = tim.tv_sec + (tim.tv_usec/1000000.0);
 		    
-		    printf("recv_SERVER: time tf:%f\n", bufp->tf);
+		    dbprintf("recv_SERVER: time tf:%f\n", bufp->tf);
 		    
 		    // size
 		    bufp->Bsize = bufp->buf_tail - bufp->buf;
-		    printf("recv_SERVER: Bsize:%ld\n", bufp->Bsize);
+		    dbprintf("recv_SERVER: Bsize:%ld\n", bufp->Bsize);
 
 		    return 1;
 		}
 	    }
 	}
     
-	printf("recv_SERVER: not fully recvd, keep recving\n");
+	dbprintf("recv_SERVER: not fully recvd, keep recving\n");
 	return 2;
     } 
 
@@ -294,15 +294,15 @@ int recv_BROW(int sock, struct buf *bufp){
     int recv_ret;
 	
     recv_ret = recv_request(sock, bufp); //recv_ret -1: recv error; 0: recv 0; 1: recv some bytes 
-    printf("===========================================================\n");
-    printf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
-
+    dbprintf("===========================================================\n");
+    dbprintf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
+    
     if (bufp->ts == 0.0) {
 	//time(&(bufp->ts));
 	struct timeval tim;
 	gettimeofday(&tim, NULL);
 	bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
-	printf("recv_BROW: time ts:%f\n", bufp->ts);
+	dbprintf("recv_BROW: time ts:%f\n", bufp->ts);
     }
 
     if (recv_ret == 1){
@@ -310,7 +310,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	//dbprint_queue(bufp->req_queue_p);
 
 	if (bufp->req_queue_p->req_count > 0) {
-	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
+	    dbprintf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
@@ -344,12 +344,12 @@ int recv_BROW(int sock, struct buf *bufp){
 
 	    return 1;
 	} else  {
-	    printf("recv_request: partially recv, keep receiving\n");
+	    dbprintf("recv_request: partially recv, keep receiving\n");
 	    return 2;
 	}
 
     } else {
-	printf("recv_request: recv 0 bytes, need to clear sock %d from master_read_fds\n", sock);
+	dbprintf("recv_request: recv 0 bytes, need to clear sock %d from master_read_fds\n", sock);
 	return 0;
     }
 
