@@ -335,6 +335,8 @@ int recv_BROW(int sock, struct buf *bufp){
 	if (bufp->req_queue_p->req_count > 0) {
 	    dbprintf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 
+	    printf("!!!\n%s\n!!!", bufp->http_req_p->orig_req);
+
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
 	    log_chunkname(bufp);	       	    
