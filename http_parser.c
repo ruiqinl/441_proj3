@@ -61,6 +61,7 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, cha
 	perror("Error! proxy, bind\n");
 	exit(-1);
     }
+    printf("send_SERVER: bind to fake ip:%s\n", fake_ip);
     
     // connect
     if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(*server_addr)) == -1) {
