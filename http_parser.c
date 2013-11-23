@@ -14,13 +14,13 @@
 
 // send to server/browser
 // return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status
-int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
+int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr, char *fake_ip) {
     assert(bufp != NULL);
     
 
     if (bufp->status == TO_SERVER) {
 	dbprintf("general_send: TO_SERVER\n");
-	send_SERVER(sock, bufp, server_addr);
+	send_SERVER(sock, bufp, server_addr, fake_ip);
 		
     } else if (bufp->status == TO_BROWSER) {
 	dbprintf("general_send: TO_BROWSER, send to sock %d\n", bufp->sock2browser);
@@ -32,7 +32,7 @@ int general_send(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
 }
 
 // return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status
-int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
+int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, char *fake_ip) {
 
     assert(server_addr != NULL);
     assert(bufp->http_reply_p != NULL);
@@ -40,13 +40,29 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr) {
     int sock2server;
     size_t numbytes, bytes_sent, bytes_left;
     char *p1, *p2;
+    struct sockaddr_in fake_addr;
 
-    // server side of proxy: whatever, get f4m first
+    // get a socket
     if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-	perror("Error! general_send, socket, socket2server");
+	perror("Error! main, socket, socket2server");
 	exit(-1);
     }
 
+    // bind fake ip
+    memset(&fake_addr, 0, sizeof(fake_addr));
+    fake_addr.sin_family = AF_INET;
+    if (inet_aton(fake_ip, &fake_addr.sin_addr) == 0) {
+	perror("Error! proxy, fake_addr, inet_aton\n");
+	exit(-1);
+    }
+    fake_addr.sin_port = htons(0);
+		    
+    if (bind(sock2server, (struct sockaddr *)&fake_addr, sizeof(fake_addr)) == -1) {
+	perror("Error! proxy, bind\n");
+	exit(-1);
+    }
+    
+    // connect
     if (connect(sock2server, (struct sockaddr*)server_addr, sizeof(*server_addr)) == -1) {
 	perror("Error! general_send, connect, socket2server");
 	exit(-1);

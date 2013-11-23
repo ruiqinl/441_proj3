@@ -36,7 +36,6 @@ int main(int argc, char *argv[]){
 
     struct sockaddr_in server_addr;
     int sock2server;
-    struct sockaddr_in fake_addr;
 
     int maxfd;
     fd_set read_fds, write_fds;
@@ -110,7 +109,6 @@ int main(int argc, char *argv[]){
 	perror("Error! main, connect, socket2server");
 	exit(-1);
     }
-
     
     all_rates = getf4m(sock2server);
     tmp_p = all_rates;
@@ -150,21 +148,7 @@ int main(int argc, char *argv[]){
 		    FD_SET(sock, &master_read_fds);
 		    buf_pts[sock] = (struct buf*)calloc(1, sizeof(struct buf));
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
-		    //printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);
-
-		    // bind fake ip
-		    memset(&fake_addr, 0, sizeof(fake_addr));
-		    fake_addr.sin_family = AF_INET;
-		    if (inet_aton(fake_ip, &fake_addr.sin_addr) == 0) {
-			perror("Error! proxy, fake_addr, inet_aton\n");
-			exit(-1);
-		    }
-		    fake_addr.sin_port = htons(0);
-		    
-		    if (bind(sock, (struct sockaddr *)&fake_addr, sizeof(fake_addr)) == -1) {
-			perror("Error! proxy, bind\n");
-			exit(-1);
-		    }
+		    //printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);		    
 
 		    // track maxfd 
 		    if (sock > maxfd)
@@ -205,7 +189,7 @@ int main(int argc, char *argv[]){
 		//printf("proxy: write bytes to browser/server\n");
 		
 		// return 1 if send some bytes, return 0 if finish sending
-		if ((send_ret = general_send(i, buf_pts[i], &server_addr)) == 0) {
+		if ((send_ret = general_send(i, buf_pts[i], &server_addr, fake_ip)) == 0) {
 		    FD_CLR(i, &master_write_fds);
 		    
 		    if (buf_pts[i]->status == TO_SERVER) {
