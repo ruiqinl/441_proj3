@@ -205,7 +205,7 @@ int main(int argc, char *argv[]){
 			close(i);
 			
 			// throughput
-			//logging(buf_pts[i], alpha, log);
+			logging(buf_pts[i], alpha, log);
 			
 			
 			

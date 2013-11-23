@@ -607,16 +607,25 @@ int logging(struct buf *bufp, double alpha, char *log) {
     duration = difftime(bufp->tf, bufp->ts);
     printf("logging: duration %f = %ld - %ld\n", duration, bufp->tf, bufp->ts);
     
-    if (duration == 0) 
-	return 0;
-
-    // tput
-    tput = bufp->Bsize / (double)duration; 
-    printf("logging: tput %f\n", tput);
-    if (avg_tput == 0.0) 
-	avg_tput = tput;
-    else 
-	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
+    if (duration == 0) {
+	// tput
+	//tput = bufp->Bsize / (double)duration; 
+	printf("logging: tput %f\n", 1544115441.0);
+	if (avg_tput == 0.0) 
+	    avg_tput = tput;
+	else 
+	    avg_tput = alpha * avg_tput + (1 - alpha) * tput;
+    
+    } else {
+	// tput
+	tput = bufp->Bsize / (double)duration; 
+	printf("logging: tput %f\n", tput);
+	if (avg_tput == 0.0) 
+	    avg_tput = tput;
+	else 
+	    avg_tput = alpha * avg_tput + (1 - alpha) * tput;
+    
+    }
     
     // bitrate, just bufp->bitrate
     printf("logging: bitrate %s\n", bufp->bitrate);
@@ -627,6 +636,5 @@ int logging(struct buf *bufp, double alpha, char *log) {
 
     return 0;
     
-
 }
 
