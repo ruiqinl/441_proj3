@@ -183,9 +183,9 @@ struct buf {
 
     //time_t ts; // done in recv_BROW
     //time_t tf; // done in recv_SERVER
-    double ts;
-    double tf;
-    size_t Bsize; // done in recv_SERVER
+    double ts; // in float seconds
+    double tf; // in float seconds
+    size_t Bsize; // done in recv_SERVER, in bytes
     int bitrate; // done in change_bitrate
     char *client_ip;// done in init_buf
     char *chunk_name; // done in log_chunkname
