@@ -192,8 +192,9 @@ int change_rate (struct buf *bufp) {
     memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
     printf("??????\n%s\n???????\n", tmp);
 
-    free(bufp->rbuf);
-    bufp->rbuf = tmp;
+    free(bufp->http_reply_p->orig_req);
+    bufp->http_reply_p->orig_req = tmp;
+    bufp->http_reply_p->orig_cur = tmp;
 
     static int count = 0;
     if (++count == 3)
@@ -314,11 +315,11 @@ int recv_BROW(int sock, struct buf *bufp){
 	//dbprint_queue(bufp->req_queue_p);
 
 	if (bufp->req_queue_p->req_count > 0) {
+	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
+
 	    dequeue_request(bufp); 
 	    change_rate(bufp);
-	    log_chunkname(bufp);
-		
-	    printf("recv_request: fully recv, switch to close, change rate, and send to server\n");
+	    log_chunkname(bufp);	       	    
 	    
 	    char *p;
 	    char *new_buf = (char *)calloc(2*strlen(bufp->http_req_p->orig_req), sizeof(char));
@@ -345,15 +346,6 @@ int recv_BROW(int sock, struct buf *bufp){
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';
 	    }
-
-
-	    //test
-	    /*static int count = 0;
-	    if (++count == 10){
-		printf("??????\n%s\n???????\n", bufp->http_req_p->orig_req);
-		exit(-1);
-		}*/
-	    
 
 	    return 1;
 	} else  {
