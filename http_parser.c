@@ -164,12 +164,14 @@ int change_rate (struct buf *bufp) {
     //printf("change_rate: not changed yet, remain %s\n", bufp->bitrate);
 
     int *p = all_rates;
-    printf("???????*p:%d\n", *p);
-    while ( *p != 0 && (*p * 1000) < (avg_tput/1.5/8))
+
+    while ( *p != 0 && (*p * 1000) < (avg_tput/1.5/8)){
+	printf("change_rate: %d ? %f\n", (*p * 1000), (avg_tput/1.5/8));
 	p++;
+    }
     
     if (*p == 0) {
-	printf("change_rate: impossible, avg_tput/1.5 is %f\n", avg_tput/1.5);
+	printf("change_rate: impossible, avg_tput/1.5/8 is %f\n", avg_tput/1.5/8);
 	exit(-1);
     } else {
 	printf("change from rate %s to %d\n", bitrate, *p);
