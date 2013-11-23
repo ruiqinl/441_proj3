@@ -196,11 +196,6 @@ int change_rate (struct buf *bufp) {
     bufp->http_reply_p->orig_req = tmp;
     bufp->http_reply_p->orig_cur = tmp;
 
-    static int count = 0;
-    if (++count == 3)
-	exit(-1);
-
-
     return 0;
 }
 
