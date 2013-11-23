@@ -186,7 +186,7 @@ int change_rate (struct buf *bufp) {
 	
     char tmp2[128];
     memset(tmp2, 0, 128);
-    sprintf(tmp2, "%d", *p);
+    sprintf(tmp2, "%d", new_rate);
 
     memcpy(tmp + (p1 - bufp->rbuf), tmp2, strlen(tmp2));
     memcpy(tmp + (p1 - bufp->rbuf) + strlen(tmp2), p2, strlen(p2));
