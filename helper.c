@@ -589,8 +589,8 @@ int logging(struct buf *bufp, double alpha, char *log, double avg_tput) {
     assert(bufp != NULL);
     assert(log != NULL);
 
-    assert(bufp->ts != 0);
-    assert(bufp->tf != 0);
+    //assert(bufp->ts != 0);
+    //assert(bufp->tf != 0);
     assert(bufp->tf >= bufp->ts);
     
     char line[1024];
