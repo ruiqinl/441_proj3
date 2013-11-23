@@ -182,6 +182,11 @@ int change_rate (struct buf *bufp) {
 
     int *p = all_rates;
 
+    if (avg_tput == 0.0) {
+	printf("change: avg_tput is 0.0, first packet, do not change rate\n");
+	return 0;
+    }
+
     while ( *p != 0 && (*p) < (avg_tput/1.5)){
 	printf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
 	p++;
