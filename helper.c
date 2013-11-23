@@ -640,7 +640,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     printf("logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
-    sprintf(line, "%ld %f %f %f %s %s %s", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+    sprintf(line, "%ld %f %f %f %s %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
 
     fputs(line, fp);
 
