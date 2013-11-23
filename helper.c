@@ -133,7 +133,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->sock2server = -1;
     bufp->sock2browser = -1;
 
-    bufp->ts = -1.0;
+    bufp->ts = 0.0;
     bufp->tf = 0.0;
     bufp->Bsize = 0;
     bufp->bitrate = 0;

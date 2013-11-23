@@ -263,7 +263,7 @@ int recv_BROW(int sock, struct buf *bufp){
     printf("===========================================================\n");
     printf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
 
-    if (bufp->ts != -1.0) {
+    if (bufp->ts == 0.0) {
 	//time(&(bufp->ts));
 	struct timeval tim;
 	gettimeofday(&tim, NULL);
