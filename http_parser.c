@@ -146,7 +146,8 @@ int change_rate (struct buf *bufp) {
     
     bufp->bitrate = (char *)calloc(128, sizeof(char));
 
-    p1 = strstr(bufp->buf, "/vod/");
+    printf("??????rbuf:%s\n", bufp->rbuf);
+    p1 = strstr(bufp->rbuf, "/vod/");
     p2 = strstr(bufp->buf, "Seg");
 
     if (p1 == NULL) {
@@ -231,7 +232,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		    printf("recv_SERVER: time tf:%ld\n", bufp->tf);
 		    
 		    // size
-		    bufp->Bsize = strlen(bufp->buf);
+		    bufp->Bsize = bufp->buf_tail - bufp->buf;
 		    printf("recv_SERVER: Bsize:%ld\n", bufp->Bsize);
 
 		    return 1;
