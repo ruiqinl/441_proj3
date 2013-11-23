@@ -114,6 +114,7 @@ struct req_queue {
 #define SEG_SIZE 4*1024*1024 // 4m
 
 extern double avg_tput;
+extern int *all_rates;
 
 struct buf {
 
@@ -185,7 +186,7 @@ struct buf {
     double ts;
     double tf;
     size_t Bsize; // done in recv_SERVER
-    char *bitrate; // done in change_bitrate
+    int bitrate; // done in change_bitrate
     char *client_ip;// done in init_buf
     char *chunk_name; // done in log_chunkname
 

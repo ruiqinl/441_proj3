@@ -545,10 +545,7 @@ int *getf4m(int sock) {
     }
     
     int *res =  parsef4m(buf);
-    
-    while (*res != 0)
-	printf("%d  ", *(res++));
-    
+        
     return res;
 }
 
@@ -631,14 +628,14 @@ int logging(struct buf *bufp, double alpha, char *log) {
 	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
     
     // bitrate, just bufp->bitrate
-    printf("logging: bitrate %s\n", bufp->bitrate);
+    printf("logging: bitrate %d\n", bufp->bitrate);
     // client_ip, just bufp->client_ip
     printf("logging: clent_ip %s\n", bufp->client_ip);
     // chunk_name, just bufp->chunkname
     printf("logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
-    sprintf(line, "%ld %f %f %f %s %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+    sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
 
     fputs(line, fp);
 

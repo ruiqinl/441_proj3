@@ -15,6 +15,7 @@
 #include "http_parser.h"
 
 double avg_tput = 0.0;
+int *all_rates = NULL;
 
 int main(int argc, char *argv[]){
 
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]){
     
     double alpha;
     char *log = NULL;
+    //int *all_rates = NULL;
     
     // parse argv
     if (argc < 8) {
@@ -106,7 +108,10 @@ int main(int argc, char *argv[]){
 	exit(-1);
     }
     
-    getf4m(sock2server);
+    all_rates = getf4m(sock2server);
+    while (*all_rates != 0)
+	printf("%d  ", *(all_rates++));
+
     close(sock2server);
     printf("proxy: got f4m\n");
 
