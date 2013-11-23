@@ -11,7 +11,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <time.h>
-#include <math.h>
+#include <cmath.h>
 
 #include "helper.h"
 #include "http_replyer.h"
