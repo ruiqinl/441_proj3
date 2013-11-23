@@ -7,6 +7,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <assert.h>
+#include <sys/time.h>
 
 #include "helper.h"
 #include "http_parser.h"
@@ -228,8 +229,12 @@ int recv_SERVER(int sock, struct buf *bufp) {
 		    printf("recv_SERVER: fully recvd\n");
 
 		    // time
-		    time(&(bufp->tf));
-		    printf("recv_SERVER: time tf:%ld\n", bufp->tf);
+		    //time(&(bufp->tf));
+		    struct timeval tim;
+		    gettimeofday(&tim, NULL);
+		    bufp->tf = tim.tv_sec + (tim.tv_usec/1000000.0);
+		    
+		    printf("recv_SERVER: time tf:%f\n", bufp->tf);
 		    
 		    // size
 		    bufp->Bsize = bufp->buf_tail - bufp->buf;
@@ -258,9 +263,12 @@ int recv_BROW(int sock, struct buf *bufp){
     printf("===========================================================\n");
     printf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
 
-    if (bufp->ts != -1) {
-	time(&(bufp->ts));
-	printf("recv_BROW: time ts:%ld\n", bufp->ts);
+    if (bufp->ts != 0) {
+	//time(&(bufp->ts));
+	struct timeval tim;
+	gettimeofday(&tim, NULL);
+	bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
+	printf("recv_BROW: time ts:%f\n", bufp->ts);
     }
 
     if (recv_ret == 1){

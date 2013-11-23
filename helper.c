@@ -11,6 +11,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <math.h>
 
 #include "helper.h"
 #include "http_replyer.h"
@@ -132,8 +133,8 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->sock2server = -1;
     bufp->sock2browser = -1;
 
-    bufp->ts = 0;
-    bufp->tf = 0;
+    bufp->ts = 0.0;
+    bufp->tf = 0.0;
     bufp->Bsize = 0;
     bufp->bitrate = 0;
     bufp->client_ip = (char *)calloc(128, sizeof(char));
@@ -600,6 +601,11 @@ int logging(struct buf *bufp, double alpha, char *log) {
 
     FILE *fp = NULL;
 
+    if (bufp->chunk_name == NULL) {
+	printf("logging: not chunk data, no need to log\n");
+	return 0;
+    }
+
     fp = fopen(log, "a");
     assert(fp != NULL);
 
@@ -609,28 +615,20 @@ int logging(struct buf *bufp, double alpha, char *log) {
     time(&cur_time);
     
     // duration
-    duration = difftime(bufp->tf, bufp->ts);
-    printf("logging: duration %f = %ld - %ld\n", duration, bufp->tf, bufp->ts);
-    
-    if (duration == 0) {
-	// tput
-	//tput = bufp->Bsize / (double)duration; 
-	printf("logging: tput %f\n", 1544115441.0);
-	if (avg_tput == 0.0) 
-	    avg_tput = tput;
-	else 
-	    avg_tput = alpha * avg_tput + (1 - alpha) * tput;
-    
-    } else {
-	// tput
-	tput = bufp->Bsize / (double)duration; 
-	printf("logging: tput %f\n", tput);
-	if (avg_tput == 0.0) 
-	    avg_tput = tput;
-	else 
-	    avg_tput = alpha * avg_tput + (1 - alpha) * tput;
-    
-    }
+    assert(bufp->tf > bufp->ts);
+    duration = bufp->tf - bufp->ts;
+    printf("logging: duration %f = %f - %f\n", duration, bufp->tf, bufp->ts);
+
+    assert(duration != 0.0);
+
+    // tput
+    tput = bufp->Bsize / duration; 
+    tput = round(tput) * 8;
+    printf("logging: tput %f bits\n", tput);
+    if (avg_tput == 0.0) 
+	avg_tput = tput;
+    else 
+	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
     
     // bitrate, just bufp->bitrate
     printf("logging: bitrate %s\n", bufp->bitrate);

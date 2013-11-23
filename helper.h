@@ -178,8 +178,10 @@ struct buf {
     int sock2server;
     int sock2browser;
 
-    time_t ts; // done in recv_BROW
-    time_t tf; // done in recv_SERVER
+    //time_t ts; // done in recv_BROW
+    //time_t tf; // done in recv_SERVER
+    double ts;
+    double tf;
     size_t Bsize; // done in recv_SERVER
     char *bitrate; // done in change_bitrate
     char *client_ip;// done in init_buf
@@ -219,5 +221,6 @@ void logprint(const char *log_file, const char *s);
 // for proj3
 int *getf4m(int sock);
 int *parsef4m(char *buf);
+int logging(struct buf *bufp, double alpha, char *log);
 
 #endif

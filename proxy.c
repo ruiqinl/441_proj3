@@ -200,15 +200,14 @@ int main(int argc, char *argv[]){
 			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
 			buf_pts[buf_pts[i]->sock2server]->ts = buf_pts[i]->ts;
 			buf_pts[buf_pts[i]->sock2server]->client_ip = buf_pts[i]->client_ip;
-
+			buf_pts[buf_pts[i]->sock2server]->bitrate = buf_pts[i]->bitrate;
+			buf_pts[buf_pts[i]->sock2server]->chunk_name = buf_pts[i]->chunk_name;			
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			close(i);
 			
 			// throughput
 			logging(buf_pts[i], alpha, log);
-			
-			
-			
+						
 		    }
 		    
 		} else if (send_ret == 1)
