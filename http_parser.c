@@ -168,7 +168,7 @@ int change_rate (struct buf *bufp) {
 	p++;
     
     if (*p == 0) {
-	printf("change_rate: impossible\n");
+	printf("change_rate: impossible, avg_tput/1.5 is %f\n", avg_tput/1.5);
 	exit(-1);
     } else {
 	printf("change from rate %s to %d\n", bitrate, *p);
