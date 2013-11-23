@@ -268,7 +268,7 @@ int recv_BROW(int sock, struct buf *bufp){
 
 	    //test
 	    static int count = 0;
-	    if (++count == 4){
+	    if (++count == 10){
 		printf("??????\n%s\n???????\n", bufp->http_req_p->orig_req);
 		exit(-1);
 	    }
