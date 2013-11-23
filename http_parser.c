@@ -148,6 +148,11 @@ int change_rate (struct buf *bufp) {
 
     p1 = strstr(bufp->buf, "/vod/");
     p2 = strstr(bufp->buf, "Seg");
+
+    if (p1 == NULL) {
+	printf("change_rate: not for chunk, no need\n");
+	return 0;
+    }
     assert(p1 != NULL);
     assert(p2 != NULL);
 
