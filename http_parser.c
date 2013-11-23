@@ -182,8 +182,8 @@ int change_rate (struct buf *bufp) {
 
     int *p = all_rates;
 
-    while ( *p != 0 && (*p * 1000) < (avg_tput/1.5/8)){
-	dbprintf("change_rate: %d ? %f\n", (*p * 1000), (avg_tput/1.5/8));
+    while ( *p != 0 && (*p) < (avg_tput/1.5)){
+	dbprintf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
 	p++;
     }
     
