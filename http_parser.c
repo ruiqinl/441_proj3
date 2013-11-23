@@ -260,7 +260,7 @@ int recv_SERVER(int sock, struct buf *bufp) {
 	    if ((p1 = strstr(bufp->buf, "\r\n\r\n")) != NULL) {
 		dbprintf("recv_SERVER: cont len:%ld\n", bufp->buf_tail - (p1+4));
 		if (bufp->buf_tail - (p1+4) == cont_len) {
-		    printf("recv_SERVER: fully recvd\n");
+		    dbprintf("recv_SERVER: fully recvd\n");
 
 		    // time
 		    //time(&(bufp->tf));

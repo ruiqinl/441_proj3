@@ -36,6 +36,7 @@ int main(int argc, char *argv[]){
 
     struct sockaddr_in server_addr;
     int sock2server;
+    struct sockaddr_in fake_addr;
 
     int maxfd;
     fd_set read_fds, write_fds;
@@ -66,6 +67,7 @@ int main(int argc, char *argv[]){
 
     printf("alpha:%f\n", alpha);
 
+
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -89,7 +91,7 @@ int main(int argc, char *argv[]){
     FD_ZERO(&master_write_fds);
     FD_SET(listen_sock, &master_read_fds);
     
-    // server side of proxy: addr
+    // server 
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     if (inet_aton(www_ip, &server_addr.sin_addr) == 0) {
@@ -98,7 +100,7 @@ int main(int argc, char *argv[]){
     }
     server_addr.sin_port = htons(8080);
     
-    // server side of proxy: whatever, get f4m first
+    //  whatever, get f4m first
     if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 	perror("Error! main, socket, socket2server");
 	exit(-1);
@@ -150,6 +152,19 @@ int main(int argc, char *argv[]){
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
 		    //printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);
 
+		    // bind fake ip
+		    memset(&fake_addr, 0, sizeof(fake_addr));
+		    fake_addr.sin_family = AF_INET;
+		    if (inet_aton(fake_ip, &fake_addr.sin_addr) == 0) {
+			perror("Error! proxy, fake_addr, inet_aton\n");
+			exit(-1);
+		    }
+		    fake_addr.sin_port = htons(sock+1);
+		    
+		    if (bind(sock, (struct sockaddr *)&fake_addr, sizeof(fake_addr)) == -1) {
+			perror("Error! proxy, bind\n");
+			exit(-1);
+		    }
 
 		    // track maxfd 
 		    if (sock > maxfd)
