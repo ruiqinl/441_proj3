@@ -620,7 +620,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     // tput
     tput = bufp->Bsize / duration; 
     tput = (tput) * 8 / 1000;
-    printf("proxy logging: tput %f Kbps\n", tput);
+    //printf("proxy logging: tput %f Kbps\n", tput);
     if (avg_tput == 0.0) 
     	avg_tput = tput;
     else 

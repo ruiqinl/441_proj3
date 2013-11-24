@@ -189,7 +189,7 @@ int change_rate (struct buf *bufp) {
     int *p = all_rates;
 
     while ( *p != 0 && (*p) <= (avg_tput/1.5)){
-	printf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
+	//printf("change_rate: %d ? %f\n", (*p), (avg_tput/1.5));
 	p++;
     }
     
@@ -200,7 +200,7 @@ int change_rate (struct buf *bufp) {
 	new_rate = *(p-1);
     }
 
-    printf("change from rate %s to %d\n", bitrate, new_rate);
+    //printf("change from rate %s to %d\n", bitrate, new_rate);
     bufp->bitrate = new_rate;
 
     // modify req

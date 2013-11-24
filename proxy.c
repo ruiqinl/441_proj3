@@ -138,8 +138,8 @@ int main(int argc, char *argv[]){
 		
 		if (i == listen_sock) {
 
-		    printf("proxy: received new connection from browser\n");
-
+		    //printf("proxy: received new connection from browser\n");
+		    
 		    if((sock = accept(listen_sock, (struct sockaddr *)&cli_addr, &cli_size)) == -1){
 			perror("Error! proxy, accpet");
 			exit(-1);
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]){
 		    FD_SET(sock, &master_read_fds);
 		    buf_pts[sock] = (struct buf*)calloc(1, sizeof(struct buf));
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
-		    printf("?????sock2server:%d\n", sock);
+		    //printf("?????sock2server:%d\n", sock);
 
 		    // track maxfd 
 		    if (sock > maxfd)
