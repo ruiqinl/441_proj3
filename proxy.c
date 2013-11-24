@@ -148,7 +148,7 @@ int main(int argc, char *argv[]){
 		    FD_SET(sock, &master_read_fds);
 		    buf_pts[sock] = (struct buf*)calloc(1, sizeof(struct buf));
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
-		    //printf("buf_pts[%d] allocated, rbuf_free_size:%d\n", sock, buf_pts[sock]->rbuf_free_size);		    
+		    printf("?????sock2server:%d\n");		    
 
 		    // track maxfd 
 		    if (sock > maxfd)
@@ -211,11 +211,12 @@ int main(int argc, char *argv[]){
 			buf_pts[buf_pts[i]->sock2server]->bitrate = buf_pts[i]->bitrate;
 			buf_pts[buf_pts[i]->sock2server]->chunk_name = buf_pts[i]->chunk_name;			
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
-			close(i);
 			
 			// throughput
 			logging(buf_pts[i], alpha, log);
 			
+			close(i);			
+			reset_buf(buf_pts[i]);
 		    }
 		    
 		} else if (send_ret == 1)

@@ -617,8 +617,6 @@ int logging(struct buf *bufp, double alpha, char *log) {
     duration = bufp->tf - bufp->ts;
     //dbprintf("logging: duration %f = %f - %f\n", duration, bufp->tf, bufp->ts);
 
-    assert(duration != 0.0);
-
     // tput
     tput = bufp->Bsize / duration; 
     tput = (tput) * 8 / 1000;
