@@ -622,10 +622,10 @@ int logging(struct buf *bufp, double alpha, char *log) {
     tput = bufp->Bsize / duration; 
     tput = (tput) * 8 / 1000;
     printf("proxy logging: tput %f Kbps\n", tput);
-    //if (avg_tput == 0.0) 
-    //	avg_tput = tput;
-    //    else 
-    avg_tput = alpha * tput + (1 - alpha) * avg_tput;
+    if (avg_tput == 0.0) 
+    	avg_tput = tput;
+    else 
+	avg_tput = alpha * tput + (1 - alpha) * avg_tput;
     
     // bitrate, just bufp->bitrate
     //printf("proxy logging: bitrate %d \n", bufp->bitrate);
