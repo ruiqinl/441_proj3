@@ -109,7 +109,14 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, cha
 	perror("Error! general_send, TO_SERVER, send\n");
 	exit(-1);
     }
-    
+
+    /*
+    struct timeval tim;
+    gettimeofday(&tim, NULL);
+    bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
+    printf("recv_BROW: time ts:%f\n", bufp->ts);
+    */
+
     return 0;
 
 }
@@ -339,7 +346,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	    gettimeofday(&tim, NULL);
 	    bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
 	    printf("recv_BROW: time ts:%f\n", bufp->ts);
-		//}
+	    //}
 	    
 	    change_rate(bufp);
 	    log_chunkname(bufp);	       	    
