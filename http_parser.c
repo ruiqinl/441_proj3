@@ -294,11 +294,13 @@ int recv_SERVER(int sock, struct buf *bufp) {
 
 		    // time
 		    //time(&(bufp->tf));
+		    /*
 		    struct timeval tim;
 		    gettimeofday(&tim, NULL);
 		    bufp->tf = tim.tv_sec + (tim.tv_usec/1000000.0);
-		    
-		    printf("recv_SERVER: time ts:%f -- double check\n", bufp->ts);
+		    */
+
+		    //printf("recv_SERVER: time ts:%f -- double check\n", bufp->ts);
 		    printf("recv_SERVER: time tf:%f\n", bufp->tf);
 		    
 		    // size
