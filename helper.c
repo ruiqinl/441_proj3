@@ -639,6 +639,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
 
     fputs(line, fp);
+    fflush(stdout);
 
     fclose(fp);
 
