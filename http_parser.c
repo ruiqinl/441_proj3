@@ -364,13 +364,13 @@ int recv_BROW(int sock, struct buf *bufp){
 		bufp->http_req_p->orig_cur = new_buf;
 
 	    }
-	    
+	    /*	    
 	    // avoid 303
 	    if ((p = strstr(bufp->http_req_p->orig_req, "If-None-Match:")) != NULL) {
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';
 	    }
-
+	    */
 
 	    return 1;
 	} else  {
