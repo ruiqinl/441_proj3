@@ -148,7 +148,7 @@ int main(int argc, char *argv[]){
 		    FD_SET(sock, &master_read_fds);
 		    buf_pts[sock] = (struct buf*)calloc(1, sizeof(struct buf));
 		    init_buf(buf_pts[sock], sock, "/var/www", &cli_addr, i);
-		    printf("?????sock2server:%d\n");		    
+		    printf("?????sock2server:%d\n", sock);
 
 		    // track maxfd 
 		    if (sock > maxfd)
