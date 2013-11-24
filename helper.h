@@ -189,7 +189,7 @@ struct buf {
     int bitrate; // done in change_bitrate
     char *client_ip;// done in init_buf
     char *chunk_name; // done in log_chunkname
-
+    time_t recv_time;
 };
 
 void init_buf(struct buf *bufp, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int server_port);
