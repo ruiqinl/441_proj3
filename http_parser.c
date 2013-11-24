@@ -914,14 +914,12 @@ int return_nolist(struct buf *bufp) {
     p2 = p1 + strlen(tag);
     memcpy(tmp + (p1 - orig) + strlen(newtag), p2, strlen(p2));
 
-    printf("?????orig_req:\n%s\n???????\n", bufp->http_reply_p->orig_req);
-    printf("?????new_req:\n%s\n???????\n", tmp);
+    //printf("?????orig_req:\n%s\n???????\n", bufp->http_reply_p->orig_req);
+    //printf("?????new_req:\n%s\n???????\n", tmp);
 
     free(bufp->http_reply_p->orig_req);
     bufp->http_reply_p->orig_req = tmp;
     bufp->http_reply_p->orig_cur = tmp;
 
-    exit(-1);
-
-
+    return 0;
 }
