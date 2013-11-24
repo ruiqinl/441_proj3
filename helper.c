@@ -603,7 +603,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
 	return 0;
     }
 
-    fp = fopen(log, "w");
+    fp = fopen(log, "a");
     assert(fp != NULL);
 
     memset(line, 0, 1024);
