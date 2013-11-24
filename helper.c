@@ -622,18 +622,18 @@ int logging(struct buf *bufp, double alpha, char *log) {
     tput = bufp->Bsize / duration; 
     tput = (tput) * 8 / 1000;
     printf("proxy logging: tput %f Kbps\n", tput);
-    if (avg_tput == 0.0) 
-	avg_tput = tput;
-    else 
-	avg_tput = alpha * avg_tput + (1 - alpha) * tput;
+    //if (avg_tput == 0.0) 
+    //	avg_tput = tput;
+    //    else 
+    avg_tput = alpha * tput + (1 - alpha) * avg_tput;
     
     // bitrate, just bufp->bitrate
-    printf("proxy logging: bitrate %d \n", bufp->bitrate);
+    //printf("proxy logging: bitrate %d \n", bufp->bitrate);
     //cprintf("proxy logging: tput:%f, new avg_tput:%f\n", tput, avg_tput);
     // client_ip, just bufp->client_ip
     //dbprintf("proxy logging: clent_ip %s\n", bufp->client_ip);
     // chunk_name, just bufp->chunkname
-    printf("proxy logging: chunk_name %s\n", bufp->chunk_name);
+    //printf("proxy logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
     sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);

@@ -30,8 +30,8 @@ int main(int argc, char *argv[]){
 
     int listen_port;// = 8888;
     char *fake_ip = NULL;
-    char *dns_ip = NULL;
-    int dns_port;
+    //    char *dns_ip = NULL;
+    //    int dns_port;
     char *www_ip = NULL;
 
     struct sockaddr_in server_addr;
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
     alpha = atof(argv[2]);
     listen_port = atoi(argv[3]);
     fake_ip = argv[4];
-    dns_ip = argv[5];
-    dns_port = atoi(argv[6]);
+    //dns_ip = argv[5];
+    //dns_port = atoi(argv[6]);
     www_ip = argv[7];
 
     printf("alpha:%f\n", alpha);
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]){
 			
 			// throughput
 			logging(buf_pts[i], alpha, log);
-						
+			
 		    }
 		    
 		} else if (send_ret == 1)

@@ -38,7 +38,7 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, cha
     assert(bufp->http_reply_p != NULL);
 
     int sock2server;
-    size_t numbytes, bytes_sent, bytes_left;
+    size_t numbytes, bytes_left;
     char *p1, *p2;
     struct sockaddr_in fake_addr;
 
@@ -78,9 +78,9 @@ int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, cha
     assert(p2 != NULL);
     assert(p2 >= p1);
 	
-    bytes_sent = p2 - p1;
+    //bytes_sent = p2 - p1;
     bytes_left = strlen(p2);
-    assert(bytes_left == strlen(p2)); // stupid
+    //assert(bytes_left == strlen(p2)); // stupid
 
     if ((numbytes = send(sock2server, p2, bytes_left, 0)) > 0) {
 	char tmp[128];
@@ -336,6 +336,9 @@ int recv_BROW(int sock, struct buf *bufp){
 	    dbprintf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 
 	    dequeue_request(bufp); 
+	    
+	    return_nolist(bufp);
+	    
 	    change_rate(bufp);
 	    log_chunkname(bufp);	       	    
 	    
@@ -891,3 +894,34 @@ int parse_message_body(struct buf *bufp) {
     return 0;
 }
 
+int return_nolist(struct buf *bufp) {
+    assert(bufp != NULL);
+
+    char *p1, *p2;
+    char *orig = bufp->rbuf;
+    char *tag = "/big_buck_bunny.f4m";
+    char *newtag = "/big_buck_bunny_nolist.f4m";
+    
+    if ((p1 = strstr(orig, tag)) == NULL) {
+	return 0;
+    }
+
+    char *tmp = (char *)calloc(2*strlen(orig), sizeof(char));
+    
+    memcpy(tmp, orig, p1 - orig);
+    memcpy(tmp + (p1 - orig), newtag, strlen(newtag));
+    
+    p2 = p1 + strlen(tag);
+    memcpy(tmp + (p1 - orig) + strlen(newtag), p2, strlen(p2));
+
+    printf("?????orig_req:\n%s\n???????\n", bufp->http_reply_p->orig_req);
+    printf("?????new_req:\n%s\n???????\n", tmp);
+
+    free(bufp->http_reply_p->orig_req);
+    bufp->http_reply_p->orig_req = tmp;
+    bufp->http_reply_p->orig_cur = tmp;
+
+    exit(-1);
+
+
+}
