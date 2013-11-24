@@ -199,17 +199,9 @@ int main(int argc, char *argv[]){
 			if (buf_pts[i]->sock2server > maxfd)
 			    maxfd = buf_pts[i]->sock2server;
 			
-			// transfer info
-			buf_pts[buf_pts[i]->sock2server] = (struct buf*)calloc(1, sizeof(struct buf));
-			init_buf(buf_pts[buf_pts[i]->sock2server], buf_pts[i]->sock2server, "/var/www", &server_addr, i); // ??? server_addr
-
 			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
- 			buf_pts[buf_pts[i]->sock2server]->status = FROM_SERVER;
-			buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
-			buf_pts[buf_pts[i]->sock2server]->ts = buf_pts[i]->ts;
-			buf_pts[buf_pts[i]->sock2server]->client_ip = buf_pts[i]->client_ip;
-			buf_pts[buf_pts[i]->sock2server]->bitrate = buf_pts[i]->bitrate;
-			buf_pts[buf_pts[i]->sock2server]->chunk_name = buf_pts[i]->chunk_name;			
+			transfer_info(buf_pts[i], buf_pts[buf_pts[i]->sock2server], &server_addr, i);
+
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			close(i);
 			

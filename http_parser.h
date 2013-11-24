@@ -20,5 +20,5 @@ int recv_SERVER(int sock, struct buf *bufp);
 int send_BROWSER(int sock, struct buf *bufp, struct sockaddr_in *server_addr);
 int send_SERVER(int sock, struct buf *bufp, struct sockaddr_in *server_addr, char *fake_ip);
 int return_nolist(struct buf *bufp);
-
+int switch_close(struct buf *bufp);
 #endif

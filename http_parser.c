@@ -325,7 +325,7 @@ int recv_BROW(int sock, struct buf *bufp){
 	struct timeval tim;
 	gettimeofday(&tim, NULL);
 	bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
-	dbprintf("recv_BROW: time ts:%f\n", bufp->ts);
+	printf("recv_BROW: time ts:%f\n", bufp->ts);
     }
 
     if (recv_ret == 1){
@@ -336,38 +336,17 @@ int recv_BROW(int sock, struct buf *bufp){
 	    dbprintf("recv_request: fully recv, switch to close, change rate, and send to server\n");
 
 	    dequeue_request(bufp); 
-	    
 	    return_nolist(bufp);
-	    
 	    change_rate(bufp);
 	    log_chunkname(bufp);	       	    
-	    
-	    char *p;
-	    char *new_buf = (char *)calloc(2*strlen(bufp->http_req_p->orig_req), sizeof(char));
-	    
-	    int len, len_left;
-	    char *close_str = "Connection: close\r\n";
-	    char *alive_str = "Connection: keep-alive\r\n";
-
-	    // switch to close
-	    if ((p = strstr(bufp->http_req_p->orig_req, alive_str)) != NULL) {
-		len = p - bufp->http_req_p->orig_req;
-		memcpy(new_buf, bufp->http_req_p->orig_req, len);
-		memcpy(new_buf+len, close_str, strlen(close_str));
-
-		len_left = strlen(p + strlen(alive_str));
-		memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len_left);
-		bufp->http_req_p->orig_req = new_buf;
-		bufp->http_req_p->orig_cur = new_buf;
-
-	    }
+	    switch_close(bufp);
 	    
 	    // avoid 303
+	    char *p = NULL;
 	    if ((p = strstr(bufp->http_req_p->orig_req, "If-None-Match:")) != NULL) {
 	    	memcpy(p, "\r\n\r\n", strlen("\r\n\r\n"));
 	    	*(p+4) = '\0';
 	    }
-
 
 	    return 1;
 	} else  {
@@ -380,6 +359,31 @@ int recv_BROW(int sock, struct buf *bufp){
 	return 0;
     }
 
+}
+
+int switch_close(struct buf *bufp) {
+
+    char *p;
+    char *new_buf = (char *)calloc(2*strlen(bufp->http_req_p->orig_req), sizeof(char));
+	    
+    int len, len_left;
+    char *close_str = "Connection: close\r\n";
+    char *alive_str = "Connection: keep-alive\r\n";
+
+    // switch to close
+    if ((p = strstr(bufp->http_req_p->orig_req, alive_str)) != NULL) {
+	len = p - bufp->http_req_p->orig_req;
+	memcpy(new_buf, bufp->http_req_p->orig_req, len);
+	memcpy(new_buf+len, close_str, strlen(close_str));
+
+	len_left = strlen(p + strlen(alive_str));
+	memcpy(new_buf+ len+ strlen(close_str), p + strlen(alive_str), len_left);
+	bufp->http_req_p->orig_req = new_buf;
+	bufp->http_req_p->orig_cur = new_buf;
+
+    }
+
+    return 0;
 }
 
 /* Return errcode, -1:recv error, 0: recv 0, 1:recv some bytes */

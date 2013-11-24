@@ -225,5 +225,6 @@ void logprint(const char *log_file, const char *s);
 int *getf4m(int sock);
 int *parsef4m(char *buf);
 int logging(struct buf *bufp, double alpha, char *log);
+int transfer_info(struct buf *from, struct buf *to, struct sockaddr_in *server_addr, int i);
 
 #endif

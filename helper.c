@@ -646,3 +646,17 @@ int logging(struct buf *bufp, double alpha, char *log) {
     
 }
 
+int transfer_info(struct buf *from, struct buf *to, struct sockaddr_in *server_addr, int i) {
+    // transfer info
+    to = (struct buf*)calloc(1, sizeof(struct buf));
+    init_buf(to, to->sock2server, "/var/www", server_addr, i); // ??? server_addr
+    
+    to->status = FROM_SERVER;
+    to->sock2browser = from->sock2browser;
+    to->ts = from->ts;
+    to->client_ip = from->client_ip;
+    to->bitrate = from->bitrate;
+    to->chunk_name = from->chunk_name;		
+
+    return 0;
+}
