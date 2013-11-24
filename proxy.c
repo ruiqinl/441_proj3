@@ -200,7 +200,7 @@ int main(int argc, char *argv[]){
 			    maxfd = buf_pts[i]->sock2server;
 			
 			FD_SET(buf_pts[i]->sock2server, &master_read_fds);
-			transfer_info(buf_pts[i], buf_pts[buf_pts[i]->sock2server], &server_addr, i);
+			transfer_info(buf_pts[i], &(buf_pts[buf_pts[i]->sock2server]), &server_addr, i);
 
 		    } else if (buf_pts[i]->status == TO_BROWSER) {
 			close(i);
