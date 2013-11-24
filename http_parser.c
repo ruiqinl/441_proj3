@@ -320,13 +320,9 @@ int recv_BROW(int sock, struct buf *bufp){
     dbprintf("===========================================================\n");
     dbprintf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
     
-    if (bufp->ts == 0.0) {
+    //if (bufp->ts == 0.0) {
 	//time(&(bufp->ts));
-	struct timeval tim;
-	gettimeofday(&tim, NULL);
-	bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
-	dbprintf("recv_BROW: time ts:%f\n", bufp->ts);
-    }
+    	//}
 
     if (recv_ret == 1){
 	parse_request(bufp);
@@ -334,6 +330,13 @@ int recv_BROW(int sock, struct buf *bufp){
 
 	if (bufp->req_queue_p->req_count > 0) {
 	    dbprintf("recv_request: fully recv, switch to close, change rate, and send to server\n");
+
+	    // time
+	    struct timeval tim;
+	    gettimeofday(&tim, NULL);
+	    bufp->ts = tim.tv_sec + (tim.tv_usec/1000000.0);
+	    dbprintf("recv_BROW: time ts:%f\n", bufp->ts);
+
 
 	    dequeue_request(bufp); 
 	    
