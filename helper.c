@@ -592,13 +592,13 @@ int logging(struct buf *bufp, double alpha, char *log) {
     assert(bufp->tf >= bufp->ts);
     
     char line[1024];
-    //time_t cur_time;
+    time_t cur_time;
     double duration;
     double tput;
     //static double avg_tput = 0.0;
 
     FILE *fp = NULL;
-
+    
     if (bufp->chunk_name == NULL) {
 	printf("logging: not chunk data, no need to log\n");
 	return 0;
@@ -610,7 +610,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     memset(line, 0, 1024);
 
     // time
-    //time(&cur_time);
+    time(&cur_time);
     
     // duration
     assert(bufp->tf > bufp->ts);
@@ -635,7 +635,8 @@ int logging(struct buf *bufp, double alpha, char *log) {
     //printf("proxy logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
-    sprintf(line, "%ld %f %f %f %d %s %s\n", bufp->recv_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+    //sprintf(line, "%ld %f %f %f %d %s %s\n", bufp->recv_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+    sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
 
     fputs(line, fp);
 
