@@ -139,7 +139,7 @@ void init_buf(struct buf* bufp, int buf_sock, const char *www, struct sockaddr_i
     bufp->bitrate = 0;
     bufp->client_ip = (char *)calloc(128, sizeof(char));
     bufp->chunk_name = NULL;
-    bufp->recv_time = 0;
+    //bufp->recv_time = 0;
 
     // clietn_ip
     inet_ntop(AF_INET, &(cli_addr->sin_addr), bufp->client_ip, INET_ADDRSTRLEN);
@@ -592,7 +592,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     assert(bufp->tf >= bufp->ts);
     
     char line[1024];
-    //time_t cur_time;
+    time_t cur_time;
     double duration;
     double tput;
     //static double avg_tput = 0.0;
@@ -610,7 +610,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     memset(line, 0, 1024);
 
     // time
-    //time(&cur_time);
+    time(&cur_time);
     
     // duration
     assert(bufp->tf > bufp->ts);
@@ -635,7 +635,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     //printf("proxy logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
-    sprintf(line, "%ld %f %f %f %d %s %s\n", bufp->recv_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+    sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
 
     fputs(line, fp);
 
@@ -645,3 +645,13 @@ int logging(struct buf *bufp, double alpha, char *log) {
     
 }
 
+int trans_info(struct buf *from, struct buf *to){
+
+  to->sock2browser = from->sock2browser;
+  to->ts = from->ts;
+  to->client_ip = from->client_ip;
+  to->bitrate = from->bitrate;
+  to->chunk_name = from->chunk_name;
+
+  return 0;
+}

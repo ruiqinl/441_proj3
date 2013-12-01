@@ -320,9 +320,10 @@ int recv_BROW(int sock, struct buf *bufp){
     dbprintf("===========================================================\n");
     dbprintf("recv_request: recv from sock %d, recv_ret is %d\n", sock, recv_ret);
     
+    /*
     if (bufp->recv_time == 0) {
 	time(&(bufp->recv_time));
-    }
+	}*/
 
     if (recv_ret == 1){
 	parse_request(bufp);

@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 
-#define DBPRINTF 0
+#define DBPRINTF 1
 #define dbprintf(...) do{if(DBPRINTF) fprintf(stderr, __VA_ARGS__); }while(0)
 
 #define MAX_SOCK 1024
@@ -189,7 +189,7 @@ struct buf {
     int bitrate; // done in change_bitrate
     char *client_ip;// done in init_buf
     char *chunk_name; // done in log_chunkname
-    time_t recv_time;
+  //time_t recv_time;
 };
 
 void init_buf(struct buf *bufp, int buf_sock, const char *www, struct sockaddr_in *cli_addr, int server_port);
@@ -225,5 +225,6 @@ void logprint(const char *log_file, const char *s);
 int *getf4m(int sock);
 int *parsef4m(char *buf);
 int logging(struct buf *bufp, double alpha, char *log);
+int trans_info(struct buf *from, struct buf *to);
 
 #endif
