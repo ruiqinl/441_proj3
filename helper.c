@@ -646,3 +646,20 @@ int logging(struct buf *bufp, double alpha, char *log) {
     
 }
 
+int transfer_info(struct buf *from, struct buf *to) {
+  /*
+  buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
+  buf_pts[buf_pts[i]->sock2server]->ts = buf_pts[i]->ts;
+  buf_pts[buf_pts[i]->sock2server]->client_ip = buf_pts[i]->client_ip;
+  buf_pts[buf_pts[i]->sock2server]->bitrate = buf_pts[i]->bitrate;
+  buf_pts[buf_pts[i]->sock2server]->chunk_name = buf_pts[i]->chunk_name;			
+  */
+
+  to->sock2browser = from->sock2browser;
+  to->ts = from->ts;
+  to->client_ip = from->client_ip;
+  to->bitrate = from->bitrate;
+  to->chunk_name = from->chunk_name;			
+  
+  return 0;
+}

@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 
-#define DBPRINTF 0
+#define DBPRINTF 1
 #define dbprintf(...) do{if(DBPRINTF) fprintf(stderr, __VA_ARGS__); }while(0)
 
 #define MAX_SOCK 1024
@@ -225,5 +225,6 @@ void logprint(const char *log_file, const char *s);
 int *getf4m(int sock);
 int *parsef4m(char *buf);
 int logging(struct buf *bufp, double alpha, char *log);
+int transfer_info(struct buf *from, struct buf *to);
 
 #endif
