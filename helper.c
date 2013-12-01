@@ -592,13 +592,13 @@ int logging(struct buf *bufp, double alpha, char *log) {
     assert(bufp->tf >= bufp->ts);
     
     char line[1024];
-    time_t cur_time;
+    //time_t cur_time;
     double duration;
     double tput;
     //static double avg_tput = 0.0;
 
     FILE *fp = NULL;
-    
+
     if (bufp->chunk_name == NULL) {
 	printf("logging: not chunk data, no need to log\n");
 	return 0;
@@ -610,7 +610,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     memset(line, 0, 1024);
 
     // time
-    time(&cur_time);
+    //time(&cur_time);
     
     // duration
     assert(bufp->tf > bufp->ts);
@@ -635,8 +635,7 @@ int logging(struct buf *bufp, double alpha, char *log) {
     //printf("proxy logging: chunk_name %s\n", bufp->chunk_name);
 
     // log
-    //sprintf(line, "%ld %f %f %f %d %s %s\n", bufp->recv_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
-    sprintf(line, "%ld %f %f %f %d %s %s\n", cur_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
+    sprintf(line, "%ld %f %f %f %d %s %s\n", bufp->recv_time, duration, tput, avg_tput, bufp->bitrate, bufp->client_ip, bufp->chunk_name);
 
     fputs(line, fp);
 
@@ -646,20 +645,3 @@ int logging(struct buf *bufp, double alpha, char *log) {
     
 }
 
-int transfer_info(struct buf *from, struct buf *to) {
-  /*
-  buf_pts[buf_pts[i]->sock2server]->sock2browser = buf_pts[i]->sock2browser;
-  buf_pts[buf_pts[i]->sock2server]->ts = buf_pts[i]->ts;
-  buf_pts[buf_pts[i]->sock2server]->client_ip = buf_pts[i]->client_ip;
-  buf_pts[buf_pts[i]->sock2server]->bitrate = buf_pts[i]->bitrate;
-  buf_pts[buf_pts[i]->sock2server]->chunk_name = buf_pts[i]->chunk_name;			
-  */
-
-  to->sock2browser = from->sock2browser;
-  to->ts = from->ts;
-  to->client_ip = from->client_ip;
-  to->bitrate = from->bitrate;
-  to->chunk_name = from->chunk_name;			
-  
-  return 0;
-}
