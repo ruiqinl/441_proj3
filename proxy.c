@@ -13,9 +13,12 @@
 #include "helper.h"
 #include "http_replyer.h"
 #include "http_parser.h"
+#include "mydns.h"
 
 double avg_tput = 0.0;
 int *all_rates = NULL;
+char *node = "video.cs.cmu.edu";
+char *service = "8080";
 
 int main(int argc, char *argv[]){
 
@@ -30,8 +33,8 @@ int main(int argc, char *argv[]){
 
     int listen_port;// = 8888;
     char *fake_ip = NULL;
-    //    char *dns_ip = NULL;
-    //    int dns_port;
+    char *dns_ip = NULL;
+    unsigned int dns_port;
     char *www_ip = NULL;
 
     struct sockaddr_in server_addr;
@@ -49,10 +52,12 @@ int main(int argc, char *argv[]){
     char *log = NULL;
     int *tmp_p = NULL;
     //int *all_rates = NULL;
+
+    struct addrinfo *res = NULL;
     
     // parse argv
-    if (argc < 8) {
-	printf("Usage: ./proxy <log> <alpha> <listen_port> <fake-ip> <dns-ip> <dns-port> <www-ip>\n");
+    if (argc < 7) {
+	printf("Usage: ./proxy <log> <alpha> <listen_port> <fake-ip> <dns-ip> <dns-port> [<www-ip>]\n");
 	return -1;
     }
 
@@ -60,12 +65,12 @@ int main(int argc, char *argv[]){
     alpha = atof(argv[2]);
     listen_port = atoi(argv[3]);
     fake_ip = argv[4];
-    //dns_ip = argv[5];
-    //dns_port = atoi(argv[6]);
-    www_ip = argv[7];
-
-    printf("alpha:%f\n", alpha);
-
+    dns_ip = argv[5];
+    dns_port = atoi(argv[6]);
+    if (argc > 7)
+      www_ip = argv[7];
+    else 
+      www_ip = NULL;
 
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -91,17 +96,34 @@ int main(int argc, char *argv[]){
     FD_SET(listen_sock, &master_read_fds);
     
     // server 
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    if (inet_aton(www_ip, &server_addr.sin_addr) == 0) {
+    
+
+    if (www_ip != NULL) {
+      // cp1
+      printf("proxy: use www_ip %s\n", www_ip);
+
+      memset(&server_addr, 0, sizeof(server_addr));
+      server_addr.sin_family = AF_INET;
+      if (inet_aton(www_ip, &server_addr.sin_addr) == 0) {
 	perror("Error! main, inet_aton");
 	exit(-1);
+      }
+      server_addr.sin_port = htons(8080); // 8080 is server port
+
+    } else {
+      // cp2
+      printf("proxy: init_mydns, and resolve\n");
+
+      init_mydns(dns_ip, dns_port);
+      resolve(node, service, NULL, &res); // service is 8080
+      server_addr = *(struct sockaddr_in *)(res->ai_addr);
+      
+      printf("proxy: resolve to server %s\n", inet_ntoa(server_addr.sin_addr));
     }
-    server_addr.sin_port = htons(8080);
     
     //  whatever, get f4m first
     if((sock2server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-	perror("Error! main, socket, socket2server");
+        perror("Error! main, socket, socket2server");
 	exit(-1);
     }
     
@@ -114,7 +136,7 @@ int main(int argc, char *argv[]){
     tmp_p = all_rates;
     while (*tmp_p != 0)
 	printf("%d  ", *(tmp_p++));
-
+    
     close(sock2server);
     printf("proxy: got f4m\n");
 

@@ -1,25 +1,41 @@
 CC = gcc
 CFLAGS = -DDEBUG -Wall -g
 
-OBJS = proxy.o http_parser.o http_replyer.o helper.o
-BINS = proxy
+OBJS_proxy = proxy.o http_parser.o http_replyer.o helper.o mydns.o 
+OBJS_name = nameserver.o
+BINS = proxy nameserver
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(BINS) 
 
-run1:
+run1cp1:
 	./proxy logfile1 0.5 8888 1.0.0.1 5.0.0.1 9999 3.0.0.1
-run2:
+run2cp1:
 	./proxy logfile2 0.5 8889 2.0.0.1 5.0.0.1 9999 4.0.0.1
-runboth:
+run1cp2:
+	./proxy logfile1 0.5 8888 1.0.0.1 5.0.0.1 9999
+run2cp2:
+	./proxy logfile2 0.5 8889 2.0.0.1 5.0.0.1 9999
+
+runbothcp1:
 	./proxy logfile1 0.5 8888 1.0.0.1 5.0.0.1 9999 3.0.0.1 >printf1.txt & ./proxy logfile2 0.5 8889 2.0.0.1 5.0.0.1 9999 4.0.0.1 > printf2.txt &
 
-proxy: $(OBJS)
+runbothcp2:
+	./proxy logfile1 0.5 8888 1.0.0.1 5.0.0.1 9999 >printf1.txt & ./proxy logfile2 0.5 8889 2.0.0.1 5.0.0.1 9999 > printf2.txt &
+
+
+rundns:
+	./nameserver -r nameserver_log 5.0.0.1 9999 ./topos/topo1/topo1.servers ./topos/topo1/topo1.lsa
+
+proxy: $(OBJS_proxy)
+	$(CC) $(CFLAGS) $^ -o $@
+
+nameserver: $(OBJS_name)
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -rf $(OBJS) $(BINS) *~
+	rm -rf $(OBJS_proxy) $(OBJS_name) $(BINS) *~
 
 

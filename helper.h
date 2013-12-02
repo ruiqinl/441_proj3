@@ -115,6 +115,8 @@ struct req_queue {
 
 extern double avg_tput;
 extern int *all_rates;
+extern char *node; // video.cs.cmu.edu
+extern char *service; // 8080, this is the video server port
 
 struct buf {
 
