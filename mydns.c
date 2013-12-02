@@ -40,6 +40,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   dns_query = make_dns_query(node);
   
   // udp socket to dns server
+  printf("resolve: dns_ip:%s, dns_port:%d\n", ip, port);
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   if (inet_aton(ip, &addr.sin_addr) == 0) {
