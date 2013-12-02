@@ -56,7 +56,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
 
   // send
   printf("mydns: ready to sendto\n");
-  if (sendto(sock, dns_query, strlen(dns_query), 0, (struct sockaddr *)&addr, sizeof(addr)) != strlen(dns_query)) {
+  if (sendto(sock, dns_query, query_len, 0, (struct sockaddr *)&addr, sizeof(addr)) != strlen(dns_query)) {
     perror("Error! mydns, sendto, maybe use while");
     exit(-1);
   }
