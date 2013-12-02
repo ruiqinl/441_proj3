@@ -229,4 +229,14 @@ int *parsef4m(char *buf);
 int logging(struct buf *bufp, double alpha, char *log);
 int transfer_info(struct buf *from, struct buf *to);
 
+/**
+ * Print the query
+ *
+ * @param query The char * to the query
+ *
+ * @return 0
+ */
+int print_query(char *query);
+
+
 #endif

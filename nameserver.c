@@ -69,7 +69,8 @@ int main(int argc, char *argv[]) {
 
     printf("nameserver: ready to recvfrom\n");
     recv_ret = recvfrom(sock, query_buf, BUF_SIZE, 0, (struct sockaddr *)&client_addr, &client_len);
-    printf("nameserver: recvd %s\n", query_buf);
+    //printf("nameserver: recvd %s\n", query_buf);
+    print_query(query_buf);
     
     if (recv_ret == -1) {
       perror("Error! nameserve, recvfrom\n");
@@ -105,3 +106,5 @@ char *choose_cnd() {
 
   return ret;
 }
+
+

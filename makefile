@@ -1,8 +1,9 @@
 CC = gcc
 CFLAGS = -DDEBUG -Wall -g
+TESTFLAGS = -DTEST
 
 OBJS_proxy = proxy.o http_parser.o http_replyer.o helper.o mydns.o 
-OBJS_name = nameserver.o
+OBJS_name = nameserver.o helper.o
 BINS_TEST = mydns_test
 BINS = proxy nameserver 
 
@@ -36,8 +37,9 @@ proxy: $(OBJS_proxy)
 nameserver: $(OBJS_name)
 	$(CC) $(CFLAGS) $^ -o $@
 
-mydns_test:
-	$(CC) $(CFLAGS) -D_TEST_MYDNS_ mydns.c helper.c -o $@
+# test dns
+mydns_test: mydns.c helper.o
+	$(CC) $(CFLAGS) $(TESTFLAGS) $^ -o $@
 
 clean:
 	rm -rf $(OBJS_proxy) $(OBJS_name) $(BINS) *~
