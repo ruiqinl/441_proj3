@@ -11,6 +11,7 @@
 
 #include "helper.h"
 #include "http_parser.h"
+#include "http_replyer.h"
 
 // send to server/browser
 // return 1 if send some bytes, return 0 if finish sending, expect reading or not depends on bufp->status

@@ -15,10 +15,12 @@
 #include "http_parser.h"
 #include "mydns.h"
 
+/* moved to helper.c
 double avg_tput = 0.0;
 int *all_rates = NULL;
 char *node = "video.cs.cmu.edu";
 char *service = "8080";
+*/
 
 int main(int argc, char *argv[]){
 

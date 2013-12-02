@@ -3,12 +3,13 @@ CFLAGS = -DDEBUG -Wall -g
 
 OBJS_proxy = proxy.o http_parser.o http_replyer.o helper.o mydns.o 
 OBJS_name = nameserver.o
-BINS = proxy nameserver
+BINS_TEST = mydns_test
+BINS = proxy nameserver 
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
-all: $(BINS) 
+all: $(BINS) $(BINS_TEST)
 
 run1cp1:
 	./proxy logfile1 0.5 8888 1.0.0.1 5.0.0.1 9999 3.0.0.1
@@ -34,6 +35,9 @@ proxy: $(OBJS_proxy)
 
 nameserver: $(OBJS_name)
 	$(CC) $(CFLAGS) $^ -o $@
+
+mydns_test:
+	$(CC) $(CFLAGS) -D_TEST_MYDNS_ mydns.c helper.c -o $@
 
 clean:
 	rm -rf $(OBJS_proxy) $(OBJS_name) $(BINS) *~

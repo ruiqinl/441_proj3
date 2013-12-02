@@ -86,9 +86,57 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
 char *make_dns_query(const char *node) {
   assert(node != NULL);
 
-  printf("make_dns_query: not imp yet, return \"dns_query\"\n");
+  //printf("make_dns_query: not imp yet, return \"dns_query\"\n");
+  static uint16_t msg_id = 0;
+  char *query = (char *)calloc(BUF_SIZE, sizeof(char));
+
+  msg_id += 1;
+
+  uint16_t QR = 0x01 << (15-0);
+  uint16_t OPCODE = 0x00 << (15-4);
+  uint16_t AA = 0x00 << (15-5);
+  uint16_t TC = 0x00;
+  uint16_t RD = 0x00;
+  uint16_t RA = 0x00;
+  uint16_t RCODE = 0x00;
+  uint16_t flags = QR & OPCODE & AA & TC & RD &RA & RCODE;
+
+  uint16_t QDCOUNT = get_qdcount(node);
+
+  uint16_t ANCOUNT = 0x00;
+  
+  make_head(&query, msg_id, flags, QDCOUNT, ANCOUNT);
+  
+  
   return "dns_query";
 
+}
+
+int make_head(char **query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT) {
+  assert(query != NULL);
+  assert(*query != NULL);
+
+  int size = 2; // 2 bytes
+
+  memcpy(*query, &msg_id, size);
+  memcpy(*query + size, &flags, size);
+  memcpy(*query + 2*size, &QDCOUNT, size);
+  memcpy(*query + 3*size, &ANCOUNT, size);
+  
+  return size*6;
+}
+
+uint16_t get_qdcount(const char *node) {
+  assert(node != NULL);
+
+  uint16_t count = 0;
+  
+  while ((node = strchr(node, '.')) != NULL) 
+    ++count;
+
+  count += 1;
+
+  return count;
 }
 
 struct sockaddr *parse_dns_reply(char *dns_reply) {
@@ -109,3 +157,15 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   
   return (struct sockaddr *)addr;
 }
+
+
+#ifdef _TEST_MYDNS_
+
+int main() {
+  
+  int count = get_qdcount("www.google.com");
+  assert(count == 3);
+
+}
+
+#endif

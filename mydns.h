@@ -61,4 +61,27 @@ char *make_dns_query(const char *node);
 struct sockaddr *parse_dns_reply(char *dns_reply);
 
 
+/**
+ * Helper function, make header section
+ *
+ * @param query The pointer to the buffer to save query
+ * @param msg_id Message ID
+ * @param flags QR & OPCODE & AA & TC &RD &RA &RCODE
+ * @param QDCOUNT 
+ * @param ANCOUNT
+ *
+ * @return size of header section, which is always 12 bytes
+ */
+int make_head(char **query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT);
+
+/**
+ * Helper function, return the number of entries in the question section
+ *
+ * @param node The query string
+ *
+ * @return number of entries of string
+ */
+uint16_t get_qdcount(const char *node);
+
+
 #endif

@@ -17,6 +17,12 @@
 #include "http_replyer.h"
 //#include "cgi_parser.h"
 
+double avg_tput = 0.0;
+int *all_rates = NULL;
+char *node = "video.cs.cmu.edu";
+char *service = "8080";
+
+
 const char CRLF[] = "\r\n";
 const char CRLF2[] = "\r\n\r\n";
 
@@ -377,20 +383,6 @@ void clear_buf_array(struct buf *buf_pts[], int maxfd){
 	    //clear_buf(buf_pts[i]);
 	}
     }
-}
-
-
-void push_error(struct buf *bufp, const char *msg) {
-
-    reset_buf(bufp);
-    push_str(bufp, msg);
-    push_header(bufp);
-    push_str(bufp, CRLF);
-
-    bufp->res_line_header_created = 1;
-    bufp->res_body_created = 1;
-    bufp->res_fully_created = 1;
-
 }
 
 

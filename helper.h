@@ -201,7 +201,7 @@ int is_2big(int fd);
 
 int push_str(struct buf* bufp, const char *str);
 int push_fd(struct buf* bufp);
-void push_error(struct buf *bufp, const char *msg);
+//void push_error(struct buf *bufp, const char *msg);
 
 void send_error(int sock, const char msg[]);
 

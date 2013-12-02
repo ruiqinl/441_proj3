@@ -193,6 +193,19 @@ void push_header(struct buf *bufp){
 
 }
 
+void push_error(struct buf *bufp, const char *msg) {
+
+    reset_buf(bufp);
+    push_str(bufp, msg);
+    push_header(bufp);
+    push_str(bufp, CRLF);
+
+    bufp->res_line_header_created = 1;
+    bufp->res_body_created = 1;
+    bufp->res_fully_created = 1;
+
+}
+
 
 /* return 0 if buf->size == 0  */
 int send_response(int sock, struct buf *bufp) {

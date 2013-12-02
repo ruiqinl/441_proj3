@@ -18,4 +18,6 @@ char *last_modified_str(struct buf *bufp);
 
 int locate_file(struct buf *bufp);
 
+void push_error(struct buf *bufp, const char *msg);
+
 #endif
