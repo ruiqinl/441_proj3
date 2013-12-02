@@ -98,5 +98,10 @@ int main(int argc, char *argv[]) {
 
 char *choose_cnd() {
   printf("choose_cnd: not imp yet\n");
-  return "15441";
+  
+  char * ret = (char *)calloc(1024, sizeof(char));
+  
+  memcpy(ret, "15441", strlen("15441"));
+
+  return ret;
 }
