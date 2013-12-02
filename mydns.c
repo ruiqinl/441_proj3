@@ -9,15 +9,15 @@
 #include "helper.h"
 #include "mydns.h"
 
-static const char *ip = NULL;
-static unsigned int port = 0;
+static const char *dns_ip = NULL;
+static unsigned int dns_port = 0;
 
-int init_mydns(const char *dns_ip, unsigned int dns_port) {
-  assert(dns_ip != NULL);
-  assert(dns_port > 0);
+int init_mydns(const char *ip, unsigned int port) {
+  assert(ip != NULL);
+  assert(port > 0);
 
-  ip = dns_ip;
-  port = dns_port;
+  dns_ip = ip;
+  dns_port = port;
 
   return 0;
 }
@@ -30,25 +30,22 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   struct sockaddr_in addr;
   char *dns_query = NULL;
   char *dns_reply = NULL;
-  //char *dns_reply_p = dns_reply;
   int sock;
-  //int buf_size;
   int ret;  
-  short port;
 
   // make query packet
+  //dns_query = make_dns_query(node, service);
   dns_query = make_dns_query(node);
   
   // udp socket to dns server
-  printf("resolve: dns_ip:%s, dns_port:%d\n", ip, port);
+  printf("resolve: dns_ip:%s, dns_port:%d\n", dns_ip, dns_port);
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  if (inet_aton(ip, &addr.sin_addr) == 0) {
+  if (inet_aton(dns_ip, &addr.sin_addr) == 0) {
     perror("Error! main, inet_aton");
     exit(-1);
   }
-  port = atoi(service);
-  addr.sin_port = htons(port);
+  addr.sin_port = htons(dns_port);
   
   if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
     perror("Error! mydns, socket");
