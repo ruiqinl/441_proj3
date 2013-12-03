@@ -6,8 +6,6 @@
 #include "helper.h"
 #include "dns_lib.h"
 
-static const char *NODE = "video.cs.cmu.edu";
-
 char *make_dns_query(const char *node, int *query_len) {
   assert(node != NULL);
 
@@ -363,6 +361,7 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   uint16_t RA = 0x00;
 
   uint16_t RCODE = 0x00;
+  const char *NODE = "video.cs.cmu.edu";
   if (strcmp(node, NODE) != 0) {
     printf("make_dns_reply: query for %s != %s, set RCODE to 0x03\n", node, NODE);
     RCODE = 0x03;
