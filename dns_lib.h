@@ -10,6 +10,7 @@ struct dns_t {
   uint16_t OPCODE;
   uint16_t AA;
   uint16_t RD;
+  uint16_t RA;
   uint16_t RCODE;
   uint16_t QDCOUNT;
   uint16_t ANCOUNT;
@@ -25,6 +26,7 @@ struct dns_t {
   uint16_t CLASS;
   uint32_t TTL;
   uint16_t RDLENGTH;
+  uint32_t RDATA;
 
 };
 

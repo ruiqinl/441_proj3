@@ -54,30 +54,31 @@ int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
   
   int offset = 0;
 
-  uint16_t NAME = 0xC00C;
+  uint16_t NAME = htons(0xC00C);
   memcpy(dns + offset, &NAME, 2);
   offset += 2;
   
-  uint16_t TYPE = 0x01;
+  uint16_t TYPE = htons(0x01);
   memcpy(dns + offset, &TYPE, 2);
   offset += 2;
   
-  uint16_t CLASS = 0x01;
+  uint16_t CLASS = htons(0x01);
   memcpy(dns + offset, &CLASS, 2);
   offset += 2;
 
-  uint32_t TTL = 0x00;
+  uint32_t TTL = htonl(0x00);
   memcpy(dns + offset, &TTL, 4);
   offset += 4;
 
-  //uint16_t RDLENGTH = 0x00;
-  memcpy(dns + offset, &RDLENGTH, 2);
+  uint16_t RDLENGTH_n = htons(RDLENGTH);
+  memcpy(dns + offset, &RDLENGTH_n, 2);
   offset += 2;
 
   if (RDLENGTH != 0) {
-    memcpy(dns + offset, &RDATA, 4);
+    uint32_t RDATA_n = htonl(RDATA);
+    memcpy(dns + offset, &RDATA_n, 4);
     offset += 4;
-  }
+  } 
 
   return offset;
 }
@@ -135,8 +136,8 @@ int make_question(char *dns, const char *node) {
   ++offset;
 
   // qtype, qclass
-  uint16_t QTYPE = 0x01;
-  uint16_t QCLASS = 0x01;
+  uint16_t QTYPE = htons(0x01);
+  uint16_t QCLASS = htons(0x01);
   memcpy(dns + offset, &QTYPE, 2);
   offset += 2;
   memcpy(dns + offset, &QCLASS, 2);
@@ -152,12 +153,23 @@ int make_head(char *dns, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint
 
   int size = 2; // 2 bytes
   
-  memcpy(dns, &msg_id, size);
-  memcpy(dns + size, &flags, size);
-  memcpy(dns + 2*size, &QDCOUNT, size);
-  memcpy(dns + 3*size, &ANCOUNT, size);
-  memcpy(dns + 4*size, &NSCOUNT, size);
-  memcpy(dns + 5*size, &ARCOUNT, size);
+  uint16_t msg_id_n = htons(msg_id);
+  memcpy(dns, &msg_id_n, size);
+  
+  uint16_t flags_n = htons(flags);
+  memcpy(dns + size, &flags_n, size);
+
+  uint16_t QDCOUNT_n = htons(QDCOUNT);
+  memcpy(dns + 2*size, &QDCOUNT_n, size);
+
+  uint16_t ANCOUNT_n = htons(ANCOUNT);
+  memcpy(dns + 3*size, &ANCOUNT_n, size);
+
+  uint16_t NSCOUNT_n = htons(NSCOUNT);
+  memcpy(dns + 4*size, &NSCOUNT_n, size);
+
+  uint16_t ARCOUNT_n = htons(ARCOUNT);
+  memcpy(dns + 5*size, &ARCOUNT_n, size);
   
   return size*6;
 }
@@ -187,9 +199,11 @@ struct dns_t *parse_dns(char *dns) {
 
   // header section
   memcpy(&(q->msg_id), dns, 2);
+  q->msg_id = ntohs(q->msg_id);
   
   memcpy(&(q->flags), dns+2, 2);
-  
+  q->flags = ntohs(q->flags);
+
   q->QR = 0x01 << 15;
   q->QR = q->QR & q->flags;
   q->QR = q->QR >> 15;
@@ -206,12 +220,18 @@ struct dns_t *parse_dns(char *dns) {
   q->RD = q->RD & q->flags;
   q->RD = q->RD >> 8;
 
+  q->RA = 0x01 << 7;
+  q->RA = q->RA & q->flags;
+  q->RA = q->RA >> 7;
+
   q->RCODE = 0x0f;
   q->RCODE = q->RCODE & q->flags;
 
   memcpy(&(q->QDCOUNT), dns+4, 2);
+  q->QDCOUNT = ntohs(q->QDCOUNT);
   
   memcpy(&(q->ANCOUNT), dns+6, 2);
+  q->ANCOUNT = ntohs(q->ANCOUNT);
   
   // query section
   q->QNAME = (char *)calloc(strlen(dns+12)+1, sizeof(char));
@@ -221,24 +241,37 @@ struct dns_t *parse_dns(char *dns) {
   p += 1;
   
   memcpy(&(q->QTYPE), p, 2);
+  q->QTYPE = ntohs(q->QTYPE);
   memcpy(&(q->QCLASS), p+2, 2);
+  q->QCLASS = ntohs(q->QCLASS);
   p += 4;
 
   // answer section
   memcpy(&(q->NAME), p, 2);
+  q->NAME = ntohs(q->NAME);
   p += 2;
   
   memcpy(&(q->TYPE), p, 2);
+  q->TYPE = ntohs(q->TYPE);
   p += 2;
   
   memcpy(&(q->CLASS), p, 2);
+  q->CLASS = ntohs(q->CLASS);
   p += 2;
 
   memcpy(&(q->TTL), p, 4);
+  q->TTL = ntohl(q->TTL);
   p += 4;
   
   memcpy(&(q->RDLENGTH), p, 2);
+  q->RDLENGTH = ntohs(q->RDLENGTH);
   p += 2;
+
+  if (q->RDLENGTH != 0) {
+    memcpy(&(q->RDATA), p, 4);
+    q->RDATA = ntohl(q->RDATA);
+    p += 4;
+  }
 
   return q;
   
@@ -256,6 +289,7 @@ int print_dns(struct dns_t *q) {
   printf("OPCODE:%x, ", q->OPCODE);
   printf("AA:%d, ", q->AA);
   printf("RD:%d, ", q->RD);
+  printf("RA:%d, ", q->RA);
   printf("RCODE:%x, ", q->RCODE);
   printf("QDCOUNT:%d, ", q->QDCOUNT);
   printf("ANCOUNT:%d\n", q->ANCOUNT);
@@ -268,9 +302,15 @@ int print_dns(struct dns_t *q) {
   printf("NAME:%x, ", q->NAME);
   printf("TYPE:%x, ", q->TYPE);
   printf("CLASS:%x, ", q->CLASS);
-  printf("TTL:%x,", q->TTL);
-  printf("RDLENGTH:%x\n", q->RDLENGTH);
+  printf("TTL:%x, ", q->TTL);
   
+  if (q->RDLENGTH != 0) {
+    printf("RDLENGTH:%x, ", q->RDLENGTH);
+    printf("RDATA:%x\n", q->RDATA);
+  } else {
+    printf("RDLENGTH:%x\n", q->RDLENGTH);
+  }
+
   return 0;
 }
 
