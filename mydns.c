@@ -37,7 +37,8 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   // make query packet
   //dns_query = make_dns_query(node, service);
   dns_query = make_dns_query(node, &query_len);
-  print_query(dns_query);
+  struct query_t *tmp = parse_query(dns_query);
+  print_query(tmp);
   
   // udp socket to dns server
   printf("resolve: dns_ip:%s, dns_port:%d\n", dns_ip, dns_port);
@@ -278,7 +279,9 @@ int main() {
 
   int query_len;
   char *dns_query = make_dns_query("www.google.com", &query_len);
-  print_query(dns_query);
+  
+  struct query_t *query = parse_query(dns_query);
+  print_query(query);
 
   return 0;
 }

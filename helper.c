@@ -656,92 +656,97 @@ int transfer_info(struct buf *from, struct buf *to) {
   return 0;
 }
 
-int print_query(char *query) {
+//
+struct query_t *parse_query(char *query) {
   assert(query != NULL);
-  
-  printf("print_query:\n");
-  
-  uint16_t msg_id;
-  memcpy(&msg_id, query, 2);
-  printf("msg_id:%x\n", msg_id);
-  
-  
-  uint16_t flags;
-  memcpy(&flags, query+2, 2);
-  
-  uint16_t QR = 0x01 << 15;
-  QR = QR & flags;
-  QR = QR >> 15;
-  printf("QR:%d\n", QR);
 
-  uint16_t OPCODE = 0x0f << 11;
-  OPCODE = OPCODE & flags;
-  OPCODE = OPCODE >> 14;
-  printf("OPCODE:%x\n", OPCODE);
+  struct query_t *q = NULL;
+  q = (struct query_t *)calloc(1, sizeof(struct query_t));
+
+
+  // header section
+  memcpy(&(q->msg_id), query, 2);
   
-  uint16_t AA = 0x01 << 10;
-  AA = AA & flags;
-  AA = AA >> 10;
-  printf("AA:%d\n", AA);
-
-  uint16_t RD = 0x01 << 8;
-  RD = RD & flags;
-  RD = RD >> 8;
-  printf("RD:%d\n", RD);
-
-  uint16_t RCODE = 0x0f;
-  RCODE = RCODE & flags;
-  printf("RCODE:%x\n", RCODE);
-
-  uint16_t QDCOUNT;
-  memcpy(&QDCOUNT, query+4, 2);
-  printf("QDCOUNT:%d\n", QDCOUNT);
+  memcpy(&(q->flags), query+2, 2);
   
-  uint16_t ANCOUNT;
-  memcpy(&ANCOUNT, query+6, 2);
-  printf("ANCOUNT:%d\n", ANCOUNT);
+  q->QR = 0x01 << 15;
+  q->QR = q->QR & q->flags;
+  q->QR = q->QR >> 15;
+
+  q->OPCODE = 0x0f << 11;
+  q->OPCODE = q->OPCODE & q->flags;
+  q->OPCODE = q->OPCODE >> 14;
+  
+  q->AA = 0x01 << 10;
+  q->AA = q->AA & q->flags;
+  q->AA = q->AA >> 10;
+
+  q->RD = 0x01 << 8;
+  q->RD = q->RD & q->flags;
+  q->RD = q->RD >> 8;
+
+  q->RCODE = 0x0f;
+  q->RCODE = q->RCODE & q->flags;
+
+  memcpy(&(q->QDCOUNT), query+4, 2);
+  
+  memcpy(&(q->ANCOUNT), query+6, 2);
   
   // query section
+  q->QNAME = (char *)calloc(strlen(query+12)+1, sizeof(char));
+  memcpy(q->QNAME, query+12, strlen(query+12));
+
   char *p = strchr(query+12, '\0');
-  //printf("p - query = %ld\n", p - query);
   p += 1;
-
-  char *QNAME = query+12;
-  printf("query section: qname:%s\n", QNAME);
-
-  short qtype, qclass;
-  memcpy(&qtype, p, 2);
-  memcpy(&qclass, p+2, 2);
-  printf("query section:%s, %x, %x\n", query + 12, qtype, qclass);
+  
+  memcpy(&(q->QTYPE), p, 2);
+  memcpy(&(q->QCLASS), p+2, 2);
+  p += 4;
 
   // answer section
-  p += 4;
-  uint16_t NAME;
-  memcpy(&NAME, p, 2);
-  printf("answer section: NAME:%x,", NAME);
+  memcpy(&(q->NAME), p, 2);
   p += 2;
   
-  uint16_t TYPE;
-  memcpy(&TYPE, p, 2);
-  printf("TYPE:%x,", TYPE);
+  memcpy(&(q->TYPE), p, 2);
   p += 2;
   
-  uint16_t CLASS;
-  memcpy(&CLASS, p, 2);
-  printf("CLASS:%x,", CLASS);
+  memcpy(&(q->CLASS), p, 2);
   p += 2;
 
-  uint32_t TTL;
-  memcpy(&TTL, p, 4);
-  printf("TTL:%x,", TTL);
+  memcpy(&(q->TTL), p, 4);
   p += 4;
   
-  uint16_t RDLENGTH;
-  memcpy(&RDLENGTH, p, 2);
-  printf("RDLENGTH:%x\n", RDLENGTH);
+  memcpy(&(q->RDLENGTH), p, 2);
   p += 2;
 
-  //printf("%d\n", *p);
+  return q;
+  
+}
+
+int print_query(struct query_t *q) {
+  assert(q != NULL);
+  printf("print_query:\n");
+
+  printf("header section:\n");
+  printf("msg_id:%x, ", q->msg_id);
+  printf("QR:%d, ", q->QR);
+  printf("OPCODE:%x, ", q->OPCODE);
+  printf("AA:%d, ", q->AA);
+  printf("RD:%d, ", q->RD);
+  printf("RCODE:%x, ", q->RCODE);
+  printf("QDCOUNT:%d, ", q->QDCOUNT);
+  printf("ANCOUNT:%d\n", q->ANCOUNT);
+  // query section
+  printf("query section:\n");
+  printf("QNAME:%s, ", q->QNAME);
+  printf("QTYPE:%x, QCLASS:%x, ", q->QTYPE, q->QCLASS);
+  // answer section
+  printf("answer section:\n");
+  printf("NAME:%x, ", q->NAME);
+  printf("TYPE:%x, ", q->TYPE);
+  printf("CLASS:%x, ", q->CLASS);
+  printf("TTL:%x,", q->TTL);
+  printf("RDLENGTH:%x\n", q->RDLENGTH);
   
   return 0;
 }
