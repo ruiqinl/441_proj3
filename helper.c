@@ -706,6 +706,9 @@ int print_query(char *query) {
   //printf("p - query = %ld\n", p - query);
   p += 1;
 
+  char *QNAME = query+12;
+  printf("query section: qname:%s\n", QNAME);
+
   short qtype, qclass;
   memcpy(&qtype, p, 2);
   memcpy(&qclass, p+2, 2);

@@ -8,7 +8,7 @@
 
 
 #define DBPRINTF 1
-#define dbprintf(...) do{if(DBPRINTF) fprintf(stderr, __VA_ARGS__); }while(0)
+#define dbprintf(...) do{if(DBPRINTF) fprintf(stdout, __VA_ARGS__); }while(0)
 
 #define MAX_SOCK 1024
 #define BUF_SIZE 8192
