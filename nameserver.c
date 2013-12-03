@@ -106,7 +106,8 @@ int main(int argc, char *argv[]) {
 
 	reply_buf = cnd_geo_dist(query, &reply_len);
       }
-      
+
+      dbprintf("nameserver: send reply back to proxy\n");
       assert(reply_len != 0);
       if ((send_ret = sendto(sock, reply_buf, reply_len, 0, (struct sockaddr *)&client_addr, client_len)) != reply_len) {
 	perror("Error! nameserver, sendto\n");
@@ -165,12 +166,11 @@ struct server_t *get_serverlist(char *servers) {
 char *cnd_rr(struct dns_t *query, uint32_t ip, int *len) {
   assert(query != NULL);
   assert(ip != 0x00);
-  dbprintf("cnd_rr:\n");
 
   char *reply = NULL;
-
-  dbprintf("cnd_rr: make_dns_reply\n");
+  
   reply = make_dns_reply(query, ip, len);
+  dbprintf("cnd_rr: choose ip %x\n", ip);
 
   return reply;
 }
