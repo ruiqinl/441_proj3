@@ -61,35 +61,6 @@ extern const int CODE_UNSET;
 
 extern struct buf *pipe_buf_array[];
 
-// struct query_t for cp2
-struct query_t {
-  
-  // header section
-  uint16_t msg_id;
-  uint16_t flags;
-  uint16_t QR;
-  uint16_t OPCODE;
-  uint16_t AA;
-  uint16_t RD;
-  uint16_t RCODE;
-  uint16_t QDCOUNT;
-  uint16_t ANCOUNT;
-  
-  // query section
-  char *QNAME;
-  uint16_t QTYPE;
-  uint16_t QCLASS;
-
-  // answer section
-  uint16_t NAME;
-  uint16_t TYPE;
-  uint16_t CLASS;
-  uint32_t TTL;
-  uint16_t RDLENGTH;
-
-};
-
-
 
 struct http_req {
 
@@ -257,23 +228,5 @@ int *getf4m(int sock);
 int *parsef4m(char *buf);
 int logging(struct buf *bufp, double alpha, char *log);
 int transfer_info(struct buf *from, struct buf *to);
-
-/**
- * Print the query
- *
- * @param query The struct queryt_t which contains all fields of query
- *
- * @return 0
- */
-int print_query(struct query_t *query);
-
-/**
- * Parse query string, fill all fields into struct query_t
- *
- * @param query The query string
- *
- * @return the pointer to the filled struct query
- */
-struct query_t *parse_query(char *query);
 
 #endif
