@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   struct dns_t *query = NULL;
   struct server_t *serverlist = NULL;
   static struct server_t *picked_server = NULL;
+  int reply_len = 0;
   
   if (strcmp(argv[1], "-r") == 0) {
     round_robin = 1;
@@ -98,15 +99,16 @@ int main(int argc, char *argv[]) {
       if (round_robin) {
 	assert(picked_server != NULL);
 
-	reply_buf = cnd_rr(query, picked_server->server);
+	reply_buf = cnd_rr(query, picked_server->server, &reply_len);
 	picked_server = picked_server->next;
 
       } else {
 
-	reply_buf = cnd_geo_dist(query);
+	reply_buf = cnd_geo_dist(query, &reply_len);
       }
       
-      if ((send_ret = sendto(sock, reply_buf, strlen(reply_buf), 0, (struct sockaddr *)&client_addr, client_len)) != strlen(reply_buf)) {
+      assert(reply_len != 0);
+      if ((send_ret = sendto(sock, reply_buf, reply_len, 0, (struct sockaddr *)&client_addr, client_len)) != reply_len) {
 	perror("Error! nameserver, sendto\n");
 	exit(-1);
       }
@@ -160,24 +162,23 @@ struct server_t *get_serverlist(char *servers) {
 }
 
 
-char *cnd_rr(struct dns_t *query, uint32_t ip) {
+char *cnd_rr(struct dns_t *query, uint32_t ip, int *len) {
   assert(query != NULL);
   assert(ip != 0x00);
   dbprintf("cnd_rr:\n");
 
-  int len;
   char *reply = NULL;
 
-  reply = make_dns_reply(query, ip, &len);
+  dbprintf("cnd_rr: make_dns_reply\n");
+  reply = make_dns_reply(query, ip, len);
 
   return reply;
 }
 
-char *cnd_geo_dist(struct dns_t *query) {
+char *cnd_geo_dist(struct dns_t *query, int *len) {
   assert(query != NULL);
   
   printf("cnd_geo_dist: not imp yet\n");
-
 
   //
   printf("Now, just return 15441\n");
