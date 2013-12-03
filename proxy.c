@@ -116,7 +116,7 @@ int main(int argc, char *argv[]){
       printf("proxy: init_mydns, and resolve\n");
 
       init_mydns(dns_ip, dns_port);
-      resolve(node, service, NULL, &res); // service is 8080
+      resolve(NODE, SERVICE, NULL, &res); // service is 8080
       server_addr = *(struct sockaddr_in *)(res->ai_addr);
       
       printf("proxy: resolve to server %s\n", inet_ntoa(server_addr.sin_addr));

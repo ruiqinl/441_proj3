@@ -6,6 +6,7 @@
 #include "helper.h"
 #include "dns_lib.h"
 
+
 char *make_dns_query(const char *node, int *query_len) {
   assert(node != NULL);
 
@@ -361,9 +362,8 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   uint16_t RA = 0x00;
 
   uint16_t RCODE = 0x00;
-  const char *NODE = "video.cs.cmu.edu";
-  if (strcmp(node, NODE) != 0) {
-    printf("make_dns_reply: query for %s != %s, set RCODE to 0x03\n", node, NODE);
+  if (strcmp(node, "video.cs.cmu.edu") != 0) { // NODE is declaredake in helper.h
+    printf("make_dns_reply: query for %s != video.cs.cmu.edu, set RCODE to 0x03\n", node);
     RCODE = 0x03;
   }
   
