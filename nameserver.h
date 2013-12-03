@@ -15,9 +15,9 @@ struct server_t {
  *
  * @return reply packet
  */
-char *cnd_rr(struct query_t *query, uint32_t server_ip);
+char *cnd_rr(struct dns_t *query, uint32_t server_ip);
 
-char *cnd_geo_dist(struct query_t *query);
+char *cnd_geo_dist(struct dns_t *query);
 
 struct server_t *get_serverlist(char *servers);
 int init_serverlist(struct server_t **list);

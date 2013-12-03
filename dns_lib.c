@@ -49,41 +49,41 @@ char *make_dns_query(const char *node, int *query_len) {
 }
 
 
-int make_answer(char *query, uint16_t RDLENGTH, uint32_t RDATA) {
-  assert(query != NULL);
+int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
+  assert(dns != NULL);
   
   int offset = 0;
 
   uint16_t NAME = 0xC00C;
-  memcpy(query + offset, &NAME, 2);
+  memcpy(dns + offset, &NAME, 2);
   offset += 2;
   
   uint16_t TYPE = 0x01;
-  memcpy(query + offset, &TYPE, 2);
+  memcpy(dns + offset, &TYPE, 2);
   offset += 2;
   
   uint16_t CLASS = 0x01;
-  memcpy(query + offset, &CLASS, 2);
+  memcpy(dns + offset, &CLASS, 2);
   offset += 2;
 
   uint32_t TTL = 0x00;
-  memcpy(query + offset, &TTL, 4);
+  memcpy(dns + offset, &TTL, 4);
   offset += 4;
 
   //uint16_t RDLENGTH = 0x00;
-  memcpy(query + offset, &RDLENGTH, 2);
+  memcpy(dns + offset, &RDLENGTH, 2);
   offset += 2;
 
   if (RDLENGTH != 0) {
-    memcpy(query + offset, &RDATA, 4);
+    memcpy(dns + offset, &RDATA, 4);
     offset += 4;
   }
 
   return offset;
 }
 
-int make_question(char *query, const char *node) {
-  assert(query != NULL);
+int make_question(char *dns, const char *node) {
+  assert(dns != NULL);
   assert(node != NULL);
   
   const char *p1, *p2;
@@ -98,12 +98,12 @@ int make_question(char *query, const char *node) {
     assert(len <= 0x3f); // ensure label format
     //dbprintf("make_question: p2 != NULL, len = %d\n", len);
     
-    memcpy(query + offset, &len, 1);
+    memcpy(dns + offset, &len, 1);
     ++offset;
     //dbprintf("make_question: push %d\n", len);
 
     for (i = 0; i < len; i++) {
-      memcpy(query + offset, p1 + i, sizeof(char));
+      memcpy(dns + offset, p1 + i, sizeof(char));
       //dbprintf("make_question: push %c\n", *(query+offset));
       ++offset;
     }
@@ -117,13 +117,13 @@ int make_question(char *query, const char *node) {
   // last seg
   len = strlen(p1);
   assert(len <= 0x3f); // ensure label format
-  memcpy(query + offset, &len, 1);
+  memcpy(dns + offset, &len, 1);
   ++offset;
   //dbprintf("make_question: push %d\n", len);
 
   //dbprintf("make_question: last seg, len = %d\n", len);
   for (i = 0; i < len; i++) {
-    memcpy(query + offset, p1 + i, sizeof(char));
+    memcpy(dns + offset, p1 + i, sizeof(char));
     //dbprintf("make_question: push %c\n", *(query + offset));
     ++offset;
   }
@@ -131,15 +131,15 @@ int make_question(char *query, const char *node) {
   //dbprintf("make_question: push str %s\n", query);
 
   // end wiht 0x00
-  *(query + offset) = 0x00;
+  *(dns + offset) = 0x00;
   ++offset;
 
   // qtype, qclass
   uint16_t QTYPE = 0x01;
   uint16_t QCLASS = 0x01;
-  memcpy(query + offset, &QTYPE, 2);
+  memcpy(dns + offset, &QTYPE, 2);
   offset += 2;
-  memcpy(query + offset, &QCLASS, 2);
+  memcpy(dns + offset, &QCLASS, 2);
   offset += 2;
   //dbprintf("make_question: QTYPE:%d QCLASS:%d\n", *(query+offset-4), *(query+offset-2));
 
@@ -147,18 +147,17 @@ int make_question(char *query, const char *node) {
 
 }
 
-int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT, uint16_t NSCOUNT, uint16_t ARCOUNT) {
-  assert(query != NULL);
-  //assert(*query != NULL);
+int make_head(char *dns, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT, uint16_t NSCOUNT, uint16_t ARCOUNT) {
+  assert(dns != NULL);
 
   int size = 2; // 2 bytes
   
-  memcpy(query, &msg_id, size);
-  memcpy(query + size, &flags, size);
-  memcpy(query + 2*size, &QDCOUNT, size);
-  memcpy(query + 3*size, &ANCOUNT, size);
-  memcpy(query + 4*size, &NSCOUNT, size);
-  memcpy(query + 5*size, &ARCOUNT, size);
+  memcpy(dns, &msg_id, size);
+  memcpy(dns + size, &flags, size);
+  memcpy(dns + 2*size, &QDCOUNT, size);
+  memcpy(dns + 3*size, &ANCOUNT, size);
+  memcpy(dns + 4*size, &NSCOUNT, size);
+  memcpy(dns + 5*size, &ARCOUNT, size);
   
   return size*6;
 }
@@ -180,16 +179,16 @@ uint16_t get_qdcount(const char *node) {
 
 
 //
-struct query_t *parse_query(char *query) {
-  assert(query != NULL);
+struct dns_t *parse_dns(char *dns) {
+  assert(dns != NULL);
 
-  struct query_t *q = NULL;
-  q = (struct query_t *)calloc(1, sizeof(struct query_t));
+  struct dns_t *q = NULL;
+  q = (struct dns_t *)calloc(1, sizeof(struct dns_t));
 
   // header section
-  memcpy(&(q->msg_id), query, 2);
+  memcpy(&(q->msg_id), dns, 2);
   
-  memcpy(&(q->flags), query+2, 2);
+  memcpy(&(q->flags), dns+2, 2);
   
   q->QR = 0x01 << 15;
   q->QR = q->QR & q->flags;
@@ -210,15 +209,15 @@ struct query_t *parse_query(char *query) {
   q->RCODE = 0x0f;
   q->RCODE = q->RCODE & q->flags;
 
-  memcpy(&(q->QDCOUNT), query+4, 2);
+  memcpy(&(q->QDCOUNT), dns+4, 2);
   
-  memcpy(&(q->ANCOUNT), query+6, 2);
+  memcpy(&(q->ANCOUNT), dns+6, 2);
   
   // query section
-  q->QNAME = (char *)calloc(strlen(query+12)+1, sizeof(char));
-  memcpy(q->QNAME, query+12, strlen(query+12));
+  q->QNAME = (char *)calloc(strlen(dns+12)+1, sizeof(char));
+  memcpy(q->QNAME, dns+12, strlen(dns+12));
 
-  char *p = strchr(query+12, '\0');
+  char *p = strchr(dns+12, '\0');
   p += 1;
   
   memcpy(&(q->QTYPE), p, 2);
@@ -246,8 +245,7 @@ struct query_t *parse_query(char *query) {
 }
 
 
-// actually, can also be used to print reply
-int print_query(struct query_t *q) {
+int print_dns(struct dns_t *q) {
   assert(q != NULL);
   printf("print_query/reply:\n");
   
@@ -295,7 +293,9 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   return (struct sockaddr *)addr;
 }
 
-char *make_dns_reply(struct query_t *query, uint32_t ip, int *query_len) {
+char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
+  assert(query != NULL);
+  assert(reply_len != NULL);
   assert(ip != 0x00);
   
   char *reply = (char *)calloc(BUF_SIZE, sizeof(char));
@@ -325,7 +325,7 @@ char *make_dns_reply(struct query_t *query, uint32_t ip, int *query_len) {
   offset += make_answer(reply + offset, RDLENGTH, RDATA);
   
   // return length
-  *query_len = offset;
+  *reply_len = offset;
 
   return reply;
 }
@@ -378,14 +378,14 @@ int main(){
 
   int len;
   char *query_str = make_dns_query("www.google.com", &len);
-  struct query_t *query = parse_query(query_str);
-  print_query(query);
+  struct dns_t *query = parse_dns(query_str);
+  print_dns(query);
 
 
   int reply_len;
   char *reply = make_dns_reply(query, 0x01, &reply_len);
-  struct query_t *reply_struct = parse_query(reply);
-  print_query(reply_struct);
+  struct dns_t *reply_struct = parse_dns(reply);
+  print_dns(reply_struct);
 
 }
 

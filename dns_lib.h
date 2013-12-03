@@ -1,7 +1,7 @@
 #ifndef _DNS_LIB_H
 #define _DNS_LIB_H
 
-struct query_t {
+struct dns_t {
 
   // header section
   uint16_t msg_id;
@@ -32,7 +32,7 @@ struct query_t {
 /**
  * Helper function, make header section
  *
- * @param query The pointer to the buffer to save query
+ * @param dns The pointer to the buffer to save dns
  * @param msg_id Message ID
  * @param flags QR & OPCODE & AA & TC &RD &RA &RCODE
  * @param QDCOUNT 
@@ -40,7 +40,7 @@ struct query_t {
  *
  * @return size of header section, which is always 12 bytes
  */
-int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT, uint16_t NSCOUNT, uint16_t ARCOUNT);
+int make_head(char *dns, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT, uint16_t NSCOUNT, uint16_t ARCOUNT);
 
 /**
  * Helper function, return the number of entries in the question section
@@ -53,42 +53,42 @@ uint16_t get_qdcount(const char *node);
 
 
 /**
- * Helper function, make question section of the query
+ * Helper function, make question section of the dns
  *
- * @param query The allocated buffer to store question section
+ * @param dns The allocated buffer to store question section
  * @param node The node to request
  *
  * @return the length of the question
  */
-int make_question(char *query, const char *node);
+int make_question(char *dns, const char *node);
 
 /**
- * Helper function, make answer section of the query
+ * Helper function, make answer section of the dns
  *
- * @param query The allocated buffer to store answer section
+ * @param dns The allocated buffer to store answer section
  *
  * @return the length of the answer
  */
-int make_answer(char *query, uint16_t RLENGTH, uint32_t RDATA);
+int make_answer(char *dns, uint16_t RLENGTH, uint32_t RDATA);
 
 
 /**
- * Print the query
+ * Print the dns
  *
- * @param query The struct queryt_t which contains all fields of query
+ * @param dns The struct dns_t which contains all fields of query
  *
  * @return 0
  */
-int print_query(struct query_t *query);
+int print_dns(struct dns_t *dns);
 
 /**
- * Parse query string, fill all fields into struct query_t
+ * Parse dns string-either query or reply, and fill all fields into struct dns_t
  *
- * @param query The query string
+ * @param dns The query/reply string
  *
- * @return the pointer to the filled struct query
+ * @return the pointer to the filled struct dns_t
  */
-struct query_t *parse_query(char *query);
+struct dns_t *parse_dns(char *dns);
 
 /**
  * Make dns reply packet
@@ -98,7 +98,7 @@ struct query_t *parse_query(char *query);
  *
  * @return char * to the reply packet
  */
-char *make_dns_reply(struct query_t *query, uint32_t ip, int *query_len);
+char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len);
 
 /**
  * Helper function, make dns query packet based on the node param. It's allocated inside, and should be freed by caller

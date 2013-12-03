@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   struct sockaddr_in client_addr, addr;
   socklen_t client_len;
   int recv_ret, send_ret;
-  struct query_t *query = NULL;
+  struct dns_t *query = NULL;
   struct server_t *serverlist = NULL;
   static struct server_t *picked_server = NULL;
   
@@ -92,8 +92,8 @@ int main(int argc, char *argv[]) {
     if (recv_ret > 0) {
       dbprintf("nameserver: recved %d bytes\n", recv_ret);
 
-      query = parse_query(query_buf);
-      print_query(query);
+      query = parse_dns(query_buf);
+      print_dns(query);
 
       if (round_robin) {
 	assert(picked_server != NULL);
@@ -159,7 +159,7 @@ struct server_t *get_serverlist(char *servers) {
   return serverlist;
 }
 
-char *cnd_rr(struct query_t *query, uint32_t ip) {
+char *cnd_rr(struct dns_t *query, uint32_t ip) {
   assert(query != NULL);
   assert(ip != 0x00);
   dbprintf("cnd_rr:\n");
@@ -178,7 +178,7 @@ char *cnd_rr(struct query_t *query, uint32_t ip) {
 
 }
 
-char *cnd_geo_dist(struct query_t *query) {
+char *cnd_geo_dist(struct dns_t *query) {
   assert(query != NULL);
   
   printf("cnd_geo_dist: not imp yet\n");
