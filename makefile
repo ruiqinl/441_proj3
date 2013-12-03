@@ -4,7 +4,7 @@ TESTFLAGS = -DTEST
 
 OBJS_proxy = proxy.o http_parser.o http_replyer.o helper.o mydns.o dns_lib.o
 OBJS_nameserver = http_parser.o http_replyer.o helper.o mydns.o dns_lib.o nameserver.o
-BINS_TEST = mydns_test nameserver_test
+BINS_TEST = mydns_test nameserver_test dns_lib_test
 BINS = proxy nameserver 
 
 .c.o:
@@ -47,8 +47,8 @@ mydns_test: mydns.c dns_lib.o
 nameserver_test: nameserver.c dns_lib.o
 	$(CC) $(CFLAGS) $(TESTFLAGS) $^ -o $@
 
+dns_lib_test: dns_lib.c
+	$(CC) $(CFLAGS) $(TESTFLAGS) $^ -o $@
 
 clean:
-	rm -rf $(OBJS_proxy) $(OBJS_nameserver) $(BINS) *~
-
-
+	rm -rf $(OBJS_proxy) $(OBJS_nameserver) $(BINS) $(BINS_TEST)*~

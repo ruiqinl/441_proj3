@@ -6,7 +6,50 @@
 #include "helper.h"
 #include "dns_lib.h"
 
-int make_answer(char *query) {
+
+char *make_dns_query(const char *node, int *query_len) {
+  assert(node != NULL);
+
+  //printf("make_dns_query: not imp yet, return \"dns_query\"\n");
+  static uint16_t msg_id = 0;
+  char *query = (char *)calloc(BUF_SIZE, sizeof(char));
+  int offset;
+
+  // make head section
+  msg_id += 1;
+
+  uint16_t QR = 0x00;
+  uint16_t OPCODE = 0x00;
+  uint16_t AA = 0x00;
+  uint16_t TC = 0x00;
+  uint16_t RD = 0x00;
+  uint16_t RA = 0x00;
+  uint16_t RCODE = 0x00;
+  uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
+
+  uint16_t QDCOUNT = get_qdcount(node);
+  uint16_t ANCOUNT = 0x00;
+  uint16_t NSCOUNT = 0x00;
+  uint16_t ARCOUNT = 0x00;
+  
+  offset = make_head(query, msg_id, flags, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT);
+
+  // make question section
+  offset += make_question(query + offset, node);
+
+  // make answer section
+  uint16_t QDLENGTH = 0x00;
+  uint32_t QDATA = 0x00; // it's not used
+  offset += make_answer(query + offset, QDLENGTH, QDATA);
+  
+  *query_len = offset;
+  
+  return query;
+
+}
+
+
+int make_answer(char *query, uint16_t RDLENGTH, uint32_t RDATA) {
   assert(query != NULL);
   
   int offset = 0;
@@ -27,11 +70,15 @@ int make_answer(char *query) {
   memcpy(query + offset, &TTL, 4);
   offset += 4;
 
-  uint16_t RDLENGTH = 0x00;
+  //uint16_t RDLENGTH = 0x00;
   memcpy(query + offset, &RDLENGTH, 2);
   offset += 2;
 
-  //uint16_t RDATA; // not exist
+  if (RDLENGTH != 0) {
+    memcpy(query + offset, &RDATA, 4);
+    offset += 4;
+  }
+
   return offset;
 }
 
@@ -49,11 +96,11 @@ int make_question(char *query, const char *node) {
   while ((p2 = strchr(p1, '.')) != NULL) {
     len = p2 - p1;
     assert(len <= 0x3f); // ensure label format
-    dbprintf("make_question: p2 != NULL, len = %d\n", len);
+    //dbprintf("make_question: p2 != NULL, len = %d\n", len);
     
     memcpy(query + offset, &len, 1);
     ++offset;
-    printf("make_question: push %d\n", len);
+    //dbprintf("make_question: push %d\n", len);
 
     for (i = 0; i < len; i++) {
       memcpy(query + offset, p1 + i, sizeof(char));
@@ -61,7 +108,7 @@ int make_question(char *query, const char *node) {
       ++offset;
     }
 
-    printf("make_question: push str %s\n", query);
+    //printf("make_question: push str %s\n", query);
 
     //
     p1 = p2 + 1;
@@ -72,16 +119,16 @@ int make_question(char *query, const char *node) {
   assert(len <= 0x3f); // ensure label format
   memcpy(query + offset, &len, 1);
   ++offset;
-  dbprintf("make_question: push %d\n", len);
+  //dbprintf("make_question: push %d\n", len);
 
-  dbprintf("make_question: last seg, len = %d\n", len);
+  //dbprintf("make_question: last seg, len = %d\n", len);
   for (i = 0; i < len; i++) {
     memcpy(query + offset, p1 + i, sizeof(char));
     //dbprintf("make_question: push %c\n", *(query + offset));
     ++offset;
   }
 
-  dbprintf("make_question: push str %s\n", query);
+  //dbprintf("make_question: push str %s\n", query);
 
   // end wiht 0x00
   *(query + offset) = 0x00;
@@ -94,13 +141,13 @@ int make_question(char *query, const char *node) {
   offset += 2;
   memcpy(query + offset, &QCLASS, 2);
   offset += 2;
-  dbprintf("make_question: QTYPE:%d QCLASS:%d\n", *(query+offset-4), *(query+offset-2));
+  //dbprintf("make_question: QTYPE:%d QCLASS:%d\n", *(query+offset-4), *(query+offset-2));
 
   return offset;
 
 }
 
-int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT) {
+int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT, uint16_t NSCOUNT, uint16_t ARCOUNT) {
   assert(query != NULL);
   //assert(*query != NULL);
 
@@ -110,6 +157,8 @@ int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, ui
   memcpy(query + size, &flags, size);
   memcpy(query + 2*size, &QDCOUNT, size);
   memcpy(query + 3*size, &ANCOUNT, size);
+  memcpy(query + 4*size, &NSCOUNT, size);
+  memcpy(query + 5*size, &ARCOUNT, size);
   
   return size*6;
 }
@@ -136,7 +185,6 @@ struct query_t *parse_query(char *query) {
 
   struct query_t *q = NULL;
   q = (struct query_t *)calloc(1, sizeof(struct query_t));
-
 
   // header section
   memcpy(&(q->msg_id), query, 2);
@@ -197,10 +245,13 @@ struct query_t *parse_query(char *query) {
   
 }
 
+
+// actually, can also be used to print reply
 int print_query(struct query_t *q) {
   assert(q != NULL);
-  printf("print_query:\n");
-
+  printf("print_query/reply:\n");
+  
+  // header section
   printf("header section: ");
   printf("msg_id:%x, ", q->msg_id);
   printf("QR:%d, ", q->QR);
@@ -225,46 +276,6 @@ int print_query(struct query_t *q) {
   return 0;
 }
 
-
-char *make_dns_query(const char *node, int *query_len) {
-  assert(node != NULL);
-
-  //printf("make_dns_query: not imp yet, return \"dns_query\"\n");
-  static uint16_t msg_id = 0;
-  char *query = (char *)calloc(BUF_SIZE, sizeof(char));
-  int offset;
-
-  // make head section
-  msg_id += 1;
-
-  uint16_t QR = 0x01 << (15-0);
-  uint16_t OPCODE = 0x00 << (15-4);
-  uint16_t AA = 0x00 << (15-5);
-  uint16_t TC = 0x00;
-  uint16_t RD = 0x00;
-  uint16_t RA = 0x00;
-  uint16_t RCODE = 0x00;
-  uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
-
-  uint16_t QDCOUNT = get_qdcount(node);
-
-  uint16_t ANCOUNT = 0x00;
-  
-  offset = make_head(query, msg_id, flags, QDCOUNT, ANCOUNT);
-
-  // make question section
-  offset += make_question(query + offset, node);
-
-  // make answer section
-  offset += make_answer(query + offset);
-  
-  *query_len = offset;
-  
-  return query;
-
-}
-
-
 struct sockaddr *parse_dns_reply(char *dns_reply) {
   assert(dns_reply != NULL);
   
@@ -284,8 +295,98 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   return (struct sockaddr *)addr;
 }
 
-char *make_dns_reply(uint32_t ip) {
+char *make_dns_reply(struct query_t *query, uint32_t ip, int *query_len) {
+  assert(ip != 0x00);
   
-  return NULL;
+  char *reply = (char *)calloc(BUF_SIZE, sizeof(char));
+  int offset = 0;
+  char *node = NULL;
+
+  // make head section
+  uint16_t QR = 0x01 << (15-0);;
+  uint16_t OPCODE = 0x00;
+  uint16_t AA = 0x01 << (15-5);
+  uint16_t TC = 0x00;
+  uint16_t RD = 0x00;
+  uint16_t RA = 0x00;
+  uint16_t RCODE = 0x00;
+  uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
+
+  uint16_t QDCOUNT = 0x00;
+  uint16_t ANCOUNT = 0x01; // ???
+  uint16_t NSCOUNT = 0x00;
+  uint16_t ARCOUNT = 0x00;
+
+  uint16_t RDLENGTH = 0x04; // 4 bytes
+  uint32_t RDATA = ip;
+  offset = make_head(reply, query->msg_id, flags, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT);
+  node = recover_node(query->QNAME);
+  offset += make_question(reply + offset, node); // same as original question
+  offset += make_answer(reply + offset, RDLENGTH, RDATA);
+  
+  // return length
+  *query_len = offset;
+
+  return reply;
+}
+
+
+char *recover_node(char *QNAME) {
+  
+  int len;
+  char *node = NULL;
+  char size_buf[1];
+  int size, count;
+  int n_offset, q_offset;
+
+  len = strlen(QNAME);
+  node = (char *)calloc(len+1, sizeof(char));
+
+  n_offset = 0;
+  q_offset = 0;
+  size = 0;
+
+  do {
+    memset(size_buf, 0, sizeof(size_buf));
+    memcpy(size_buf, QNAME + q_offset, 1);
+    ++q_offset;
+
+    size = (int)*size_buf;
+    //dbprintf("??size:%d\n", size);
+    node[n_offset] = '.';
+    ++n_offset;
+    for (count = 0; count < size; count++) {
+      node[n_offset] = QNAME[q_offset + count];
+      //dbprintf("??node[%d]:%c\n", n_offset, node[n_offset]);
+      ++n_offset;
+    }
+    q_offset += size;
+
+  } while (n_offset < len-1);
+  
+  memmove(node, node+1, len-1);
+  node[len-1] = '\0';
+  dbprintf("recover_node: QNAME:%s, recovered node:%s\n", QNAME, node);
+
+  return node;
+}
+
+
+#ifdef TEST
+
+int main(){
+
+  int len;
+  char *query_str = make_dns_query("www.google.com", &len);
+  struct query_t *query = parse_query(query_str);
+  print_query(query);
+
+
+  int reply_len;
+  char *reply = make_dns_reply(query, 0x01, &reply_len);
+  struct query_t *reply_struct = parse_query(reply);
+  print_query(reply_struct);
 
 }
+
+#endif

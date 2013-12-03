@@ -2,7 +2,7 @@
 #define _DNS_LIB_H
 
 struct query_t {
-  
+
   // header section
   uint16_t msg_id;
   uint16_t flags;
@@ -40,7 +40,7 @@ struct query_t {
  *
  * @return size of header section, which is always 12 bytes
  */
-int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT);
+int make_head(char *query, uint16_t msg_id, uint16_t flags, uint16_t QDCOUNT, uint16_t ANCOUNT, uint16_t NSCOUNT, uint16_t ARCOUNT);
 
 /**
  * Helper function, return the number of entries in the question section
@@ -69,7 +69,7 @@ int make_question(char *query, const char *node);
  *
  * @return the length of the answer
  */
-int make_answer(char *query);
+int make_answer(char *query, uint16_t RLENGTH, uint32_t RDATA);
 
 
 /**
@@ -94,10 +94,11 @@ struct query_t *parse_query(char *query);
  * Make dns reply packet
  *
  * @param ip The ip which should be contained in the reply
+ * @param query The received query, whose question part should be contained in reply
  *
  * @return char * to the reply packet
  */
-char *make_dns_reply(uint32_t ip);
+char *make_dns_reply(struct query_t *query, uint32_t ip, int *query_len);
 
 /**
  * Helper function, make dns query packet based on the node param. It's allocated inside, and should be freed by caller
@@ -118,6 +119,9 @@ char *make_dns_query(const char *node, int *query_len);
  */
 struct sockaddr *parse_dns_reply(char *dns_reply);
 
-
+/**
+ * Recover node from QNAME
+ */
+char *recover_node(char *QNAME);
 
 #endif

@@ -164,7 +164,9 @@ char *cnd_rr(struct query_t *query, uint32_t ip) {
   assert(ip != 0x00);
   dbprintf("cnd_rr:\n");
 
-  make_dns_reply(ip);
+  int len;
+
+  make_dns_reply(query, ip, &len);
 
   // 
   printf("Now, just return 15441\n");
