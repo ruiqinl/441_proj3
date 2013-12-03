@@ -1,6 +1,8 @@
 #ifndef _NAMESERVER_H_
 #define _NAMESERVER_H_
 
+#include "helper.h"
+
 /**
  * Parse the received query, choose cnd, return reply packet
  *
@@ -8,7 +10,7 @@
  *
  * @return reply packet
  */
-char *choose_cnd(char *query);
+char *choose_cnd(struct query_t *query);
 
 
 #endif

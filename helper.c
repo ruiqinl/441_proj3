@@ -727,7 +727,7 @@ int print_query(struct query_t *q) {
   assert(q != NULL);
   printf("print_query:\n");
 
-  printf("header section:\n");
+  printf("header section: ");
   printf("msg_id:%x, ", q->msg_id);
   printf("QR:%d, ", q->QR);
   printf("OPCODE:%x, ", q->OPCODE);
@@ -737,11 +737,11 @@ int print_query(struct query_t *q) {
   printf("QDCOUNT:%d, ", q->QDCOUNT);
   printf("ANCOUNT:%d\n", q->ANCOUNT);
   // query section
-  printf("query section:\n");
+  printf("query section: ");
   printf("QNAME:%s, ", q->QNAME);
-  printf("QTYPE:%x, QCLASS:%x, ", q->QTYPE, q->QCLASS);
+  printf("QTYPE:%x, QCLASS:%x\n", q->QTYPE, q->QCLASS);
   // answer section
-  printf("answer section:\n");
+  printf("answer section: ");
   printf("NAME:%x, ", q->NAME);
   printf("TYPE:%x, ", q->TYPE);
   printf("CLASS:%x, ", q->CLASS);
