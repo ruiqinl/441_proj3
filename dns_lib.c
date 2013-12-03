@@ -321,7 +321,8 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   struct dns_t *reply = NULL;
 
   reply = parse_dns(dns_reply);
-  assert(reply->RDLENGTH == 4);
+  //assert(reply->RDLENGTH == 4);
+  printf("reply->RDLENGTH:%x\n", reply->RDLENGTH);
   assert(reply->RDATA != 0x00);
   
   printf("parse_dns_reply: recvd ip is %x\n", reply->RDATA);
@@ -414,7 +415,7 @@ char *recover_node(char *QNAME) {
   
   memmove(node, node+1, len-1);
   node[len-1] = '\0';
-  dbprintf("recover_node: QNAME:%s, recovered node:%s\n", QNAME, node);
+  //dbprintf("recover_node: QNAME:%s, recovered node:%s\n", QNAME, node);
 
   return node;
 }
@@ -435,6 +436,7 @@ int main(){
   struct dns_t *reply_struct = parse_dns(reply);
   print_dns(reply_struct);
 
+  return 0;
 }
 
 #endif
