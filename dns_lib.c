@@ -6,6 +6,7 @@
 #include "helper.h"
 #include "dns_lib.h"
 
+static const char *NODE = "video.cs.cmu.edu";
 
 char *make_dns_query(const char *node, int *query_len) {
   assert(node != NULL);
@@ -321,8 +322,8 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   struct dns_t *reply = NULL;
 
   reply = parse_dns(dns_reply);
-  //assert(reply->RDLENGTH == 4);
-  printf("reply->RDLENGTH:%x\n", reply->RDLENGTH);
+  assert(reply->RDLENGTH == 4);
+  //printf("reply->RDLENGTH:%x\n", reply->RDLENGTH);
   assert(reply->RDATA != 0x00);
   
   printf("parse_dns_reply: recvd ip is %x\n", reply->RDATA);
@@ -351,6 +352,8 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   int offset = 0;
   char *node = NULL;
 
+  node = recover_node(query->QNAME);
+
   // make head section
   uint16_t QR = 0x01 << (15-0);;
   uint16_t OPCODE = 0x00;
@@ -358,7 +361,13 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   uint16_t TC = 0x00;
   uint16_t RD = 0x00;
   uint16_t RA = 0x00;
-  uint16_t RCODE = 0x00;
+  uint16_t RCODE = 0x00
+
+  if (strcmp(node, NODE) != 0) {
+    printf("make_dns_reply: query for %s != %s, set RCODE to 0x03\n", node, NODE);
+    RCODE = 0x03;
+  }
+  
   uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
 
   uint16_t QDCOUNT = 0x00;
@@ -369,7 +378,7 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   uint16_t RDLENGTH = 0x04; // 4 bytes
   uint32_t RDATA = ip;
   offset = make_head(reply, query->msg_id, flags, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT);
-  node = recover_node(query->QNAME);
+
   offset += make_question(reply + offset, node); // same as original question
   offset += make_answer(reply + offset, RDLENGTH, RDATA);
   

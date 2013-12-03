@@ -51,4 +51,4 @@ dns_lib_test: dns_lib.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) $^ -o $@
 
 clean:
-	rm -rf $(OBJS_proxy) $(OBJS_nameserver) $(BINS) $(BINS_TEST)*~
+	rm -rf $(OBJS_proxy) $(OBJS_nameserver) $(BINS) $(BINS_TEST) *.dSYM *.~
