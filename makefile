@@ -29,7 +29,7 @@ runbothcp2:
 
 
 rundns:
-	./nameserver -r nameserver_log 5.0.0.1 9999 ./topos/topo1/topo1.servers ./topos/topo1/topo1.lsa > printf_dns.txt
+	./nameserver -r nameserver_log 5.0.0.1 9999 ./topos/topo1/topo1.servers ./topos/topo1/topo1.lsa
 
 proxy: $(OBJS_proxy)
 	$(CC) $(CFLAGS) $^ -o $@
