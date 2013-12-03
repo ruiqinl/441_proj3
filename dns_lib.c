@@ -361,8 +361,8 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   uint16_t TC = 0x00;
   uint16_t RD = 0x00;
   uint16_t RA = 0x00;
-  uint16_t RCODE = 0x00
 
+  uint16_t RCODE = 0x00;
   if (strcmp(node, NODE) != 0) {
     printf("make_dns_reply: query for %s != %s, set RCODE to 0x03\n", node, NODE);
     RCODE = 0x03;
