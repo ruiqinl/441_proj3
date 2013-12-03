@@ -35,10 +35,12 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   int ret;  
   int query_len;
 
+  struct dns_t * tmp = NULL;
+
   // make query packet
   //dns_query = make_dns_query(node, service);
   dns_query = make_dns_query(node, &query_len);
-  struct dns_t *tmp = parse_dns(dns_query);
+  tmp = parse_dns(dns_query);
   print_dns(tmp);
   
   // udp socket to dns server
@@ -66,7 +68,11 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   dns_reply = (char *)calloc(BUF_SIZE, sizeof(char));
 
   ret = recvfrom(sock, dns_reply, BUF_SIZE, 0, NULL, NULL);
-  printf("resolve: recvd %s\n", dns_reply);
+  printf("resolve: recvd %d bytes\n", ret);
+  
+  // 
+  tmp = parse_dns(dns_reply);
+  print_dns(tmp);
 
   if (ret == -1) {
     perror("Error! mydns, recvfrom");
