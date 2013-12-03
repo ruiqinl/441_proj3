@@ -318,17 +318,25 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   assert(dns_reply != NULL);
   
   struct sockaddr_in *addr;
+  struct dns_t *reply = NULL;
+
+  reply = parse_dns(dns_reply);
+  assert(reply->RDLENGTH == 4);
+  assert(reply->RDATA != 0x00);
+  
+  printf("parse_dns_reply: recvd ip is %x\n", reply->RDATA);
   
   addr = (struct sockaddr_in *)calloc(1, sizeof(struct sockaddr_in));
 
   addr->sin_family = AF_INET;
+  addr->sin_addr.s_addr = reply->RDATA;
+  /*
   if (inet_aton("3.0.0.1", &(addr->sin_addr)) == 0) {
     perror("Error! main, inet_aton");
     exit(-1);
-  }
+    }
+  */
   addr->sin_port = htons(8080);
-  
-  printf("parse_dns_reply: not imp yet, return sockaddr with sin_addr 3.0.0.1\n");
   
   return (struct sockaddr *)addr;
 }
@@ -423,7 +431,7 @@ int main(){
 
 
   int reply_len;
-  char *reply = make_dns_reply(query, 0x01, &reply_len);
+  char *reply = make_dns_reply(query, 0x30000001, &reply_len);
   struct dns_t *reply_struct = parse_dns(reply);
   print_dns(reply_struct);
 

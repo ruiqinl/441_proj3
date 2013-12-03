@@ -42,7 +42,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   print_dns(tmp);
   
   // udp socket to dns server
-  printf("resolve: dns_ip:%s, dns_port:%d\n", dns_ip, dns_port);
+  printf("resolve: send query to dns_ip:%s, dns_port:%d\n", dns_ip, dns_port);
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   if (inet_aton(dns_ip, &addr.sin_addr) == 0) {
@@ -57,20 +57,17 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   }
 
   // send
-  printf("mydns: ready to sendto\n");
+  printf("resolve: try to send to dns:%s\n", dns_query);
   if (sendto(sock, dns_query, query_len, 0, (struct sockaddr *)&addr, sizeof(addr)) != query_len) {
     perror("Error! mydns, sendto, maybe use while");
     exit(-1);
   }
-  printf("mydns: sent %s\n", dns_query);
 
   // recv
   dns_reply = (char *)calloc(BUF_SIZE, sizeof(char));
-  //dns_reply_p = dns_reply;
-  //buf_size = BUF_SIZE;
 
   ret = recvfrom(sock, dns_reply, BUF_SIZE, 0, NULL, NULL);
-  printf("mydns: recvd %s\n", dns_reply);
+  printf("resolve: recvd %s\n", dns_reply);
 
   if (ret == -1) {
     perror("Error! mydns, recvfrom");

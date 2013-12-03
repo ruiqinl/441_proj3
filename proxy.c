@@ -69,7 +69,6 @@ int main(int argc, char *argv[]){
     fake_ip = argv[4];
     dns_ip = argv[5];
     dns_port = atoi(argv[6]);
-    printf("argv[6]:%s, dns_port:%d\n", argv[6], dns_port);
     if (argc > 7)
       www_ip = argv[7];
     else 
@@ -99,7 +98,6 @@ int main(int argc, char *argv[]){
     FD_SET(listen_sock, &master_read_fds);
     
     // server 
-    
 
     if (www_ip != NULL) {
       // cp1

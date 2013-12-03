@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 
       query = parse_dns(query_buf);
       print_dns(query);
-
+      
       if (round_robin) {
 	assert(picked_server != NULL);
 
@@ -159,23 +159,18 @@ struct server_t *get_serverlist(char *servers) {
   return serverlist;
 }
 
+
 char *cnd_rr(struct dns_t *query, uint32_t ip) {
   assert(query != NULL);
   assert(ip != 0x00);
   dbprintf("cnd_rr:\n");
 
   int len;
+  char *reply = NULL;
 
-  make_dns_reply(query, ip, &len);
+  reply = make_dns_reply(query, ip, &len);
 
-  // 
-  printf("Now, just return 15441\n");
-  char * ret = (char *)calloc(1024, sizeof(char));
-  
-  memcpy(ret, "15441", strlen("15441"));
-
-  return ret;
-
+  return reply;
 }
 
 char *cnd_geo_dist(struct dns_t *query) {
