@@ -6,6 +6,8 @@
 #include "helper.h"
 #include "dns_lib.h"
 #include "nameserver.h"
+#include "graph.h"
+#include "list.h"
 
 #ifndef TEST
 
@@ -32,6 +34,8 @@ int main(int argc, char *argv[]) {
   int serverlist_len = 0;
   int reply_len = 0;
   uint32_t next_ip;
+  int **graph;
+  int graph_size;
   
   if (strcmp(argv[1], "-r") == 0) {
     round_robin = 1;
@@ -40,9 +44,9 @@ int main(int argc, char *argv[]) {
     port = atoi(argv[4]);
     servers = argv[5];
     LSAs = argv[6];
-
+  
     serverlist = get_serverlist(servers, &serverlist_len);
-    
+  
   } else {
     round_robin = 0;
     log = argv[1];
@@ -50,8 +54,12 @@ int main(int argc, char *argv[]) {
     port = atoi(argv[3]);
     servers = argv[4];
     LSAs = argv[5];
+
+    serverlist = get_serverlist(servers, &serverlist_len);
+    graph = make_graph(serverlist, LSAs, &graph_size);
   }
 
+  
 
   // sock
   if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
@@ -104,7 +112,7 @@ int main(int argc, char *argv[]) {
 
       } else {
 
-	reply_buf = cnd_geo_dist(query, &reply_len, servers, LSAs);
+	reply_buf = cnd_geo_dist(query, &reply_len, graph, LSAs);
       }
 
       dbprintf("nameserver: send reply back to proxy\n");
@@ -136,14 +144,14 @@ char *cnd_rr(struct dns_t *query, uint32_t ip, int *len) {
   return reply;
 }
 
-char *cnd_geo_dist(struct dns_t *query, int *len, char *servers, char *LSAs) {
+char *cnd_geo_dist(struct dns_t *query, int *len, int **graph, char *server_list) {
   assert(query != NULL);
   assert(len != NULL);
   
   char *reply = NULL;
+  //int server_ind;
 
   // figout out ip
-  //graph = make_graph(servers, LSAs);
   //server_ind = dijkstra(graph);
 
   //reply = make_dns_reply(query, ip, len);
@@ -276,6 +284,174 @@ int print_serverlist(struct server_t *list) {
   return 0;
 }
 
+
+int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
+  //assert(server_list != NULL);
+  assert(LSAs != NULL);
+  //assert(graph_size != NULL);
+  
+  FILE *fp = NULL;
+  int line_size = 1024;
+  char line[line_size];
+  struct lsa_t *lsa = NULL;
+  struct list_node_t *lsa_list = NULL;
+  struct list_node_t *ip_list = NULL;
+
+  //init_list(&lsa_list);
+
+  // get host list first
+  if((fp = fopen(LSAs, "r")) == NULL) {
+    perror("Error! make_graph, fopen");
+    exit(-1);
+  }
+
+  memset(line, 0, line_size);
+  while (fgets(line, line_size, fp) != NULL) {
+    lsa = parse_line(line);
+    push(&lsa_list, lsa);
+  
+    collect_ip(&ip_list, lsa);
+    
+    memset(line, 0, line_size);
+  }
+
+  print_list(lsa_list, printer_lsa);
+
+  // to ind list
+  
+  
+  // generate graph
+  
+  return NULL;
+
+}
+
+char *make_server_list(char *servers) {
+  assert(servers != NULL);
+
+  FILE *fp = NULL;
+  char *line = NULL;
+
+  if ((fp = fopen(servers, "r")) == NULL) {
+    perror("Error! make_server_array, fopen\n");
+    exit(-1);
+  }
+  
+  line = (char *)calloc(128, sizeof(char));
+  while(fgets(line, 128, fp) != NULL) {
+    
+  }
+  
+  return NULL;
+}
+
+struct lsa_t *parse_line(char *line) {
+  assert(line != NULL);
+
+  char *p1 = NULL;
+  char *p2 = NULL;
+  struct lsa_t *lsa = NULL;
+  struct list_node_t *neighbors = NULL;
+  int tmp_size = 128;
+  char tmp[tmp_size];
+  char *n_ip;
+
+  lsa = (struct lsa_t *)calloc(1, sizeof(struct lsa_t));
+
+  // ip
+  p1 = line;
+  if ((p2 = strchr(p1, ' ')) == NULL) {
+    printf("Error! parse_line, ip, wrong format\n");
+    exit(-1);
+  }
+  
+  lsa->ip = (char *)calloc(p2 - p1 + 1, sizeof(char));
+  memcpy(lsa->ip, p1, p2-p1);
+  //dbprintf("parse_line: ip:%s, ", lsa->ip);
+
+  // seq_num
+  p1 = p2 + 1;
+  if ((p2 = strchr(p1, ' ')) == NULL) {
+    printf("Error! parse_line, seq_num, wrong format\n");
+    exit(-1);
+  }
+  
+  memset(tmp, 0, tmp_size);
+  memcpy(tmp, p1, p2-p1);
+  lsa->seq_num = atoi(tmp);
+  //dbprintf("seq_num:%d, ", lsa->seq_num);
+
+  // neighbors  
+  //init_list(&neighbors);
+  
+  //dbprintf("neighbors:");
+  p1 = p2 + 1;
+  while ((p2 = strchr(p1, ',')) != NULL || (p2 = strchr(p1, '\n')) != NULL) {
+    n_ip = (char *)calloc(p2-p1+1, sizeof(char));
+    memcpy(n_ip, p1, p2-p1);
+    push(&neighbors, n_ip);
+    //dbprintf("%s, ", n_ip);
+    
+    p1 = p2 + 1;
+  }
+
+  lsa->neighbors = neighbors;
+
+  // done
+  return lsa;
+}
+
+void printer_lsa(void *data) {
+  assert(data != NULL);
+  struct lsa_t *lsa = (struct lsa_t *)data;
+
+  dbprintf("ip:%s, seq_num:%d, neighbors:", lsa->ip, lsa->seq_num);
+  print_list(lsa->neighbors, printer_str);
+
+}
+
+int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa) {
+  assert(ip_list != NULL);
+  assert(lsa != NULL);
+  dbprintf("collect_ip:\n");
+  
+  char *ip = NULL;
+  struct list_node_t *neighbor = NULL;
+  char *str = NULL;
+  
+
+  // ip part
+  if (list_ind(*ip_list, lsa->ip, comparor_str) == -1) {
+    ip = (char *)calloc(strlen(lsa->ip)+1, sizeof(char));
+    memcpy(ip, lsa->ip, strlen(lsa->ip));
+    push(ip_list, ip);
+    print_list(*ip_list, printer_str);
+  }
+
+  // neighbor list part
+  neighbor = lsa->neighbors;
+  while (neighbor != NULL) {
+
+    str = (char *)neighbor->data;
+
+    if (list_ind(*ip_list, str, comparor_str) != -1) {
+      neighbor = neighbor->next;
+      continue;
+    }
+
+    ip = (char *)calloc(strlen(str)+1, sizeof(char));
+    memcpy(ip, str, strlen(str));
+
+    push(ip_list, ip);
+    //print_list(*ip_list, printer_str);
+
+    neighbor = neighbor->next;
+  }
+  
+  return 0;
+}
+
+
 #ifdef TEST
 
 int main(){
@@ -305,6 +481,13 @@ int main(){
   printf("test get_serverlist:\n");
   servers = get_serverlist("./topos/topo1/topo1.servers", &len);
   //print_serverlist(servers);
+
+  // test parse_line
+  //struct lsa_t *lsa = parse_line("router2 6 3.0.0.1,4.0.0.1,5.0.0.1,router1\n\n\n");
+  //printer_lsa(lsa);
+
+  // test make_graph
+  make_graph(NULL, "./topos/topo1/topo1.lsa", NULL);
 
   return 0;
 }

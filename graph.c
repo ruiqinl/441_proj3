@@ -17,7 +17,7 @@ void init_pq(struct pq_t **pq, int max_size){
 }
 
 
-int push(struct pq_t *pq, struct node_t *node, int *dist) {
+int push_graph(struct pq_t *pq, struct node_t *node, int *dist) {
     assert(pq != NULL);
     assert(node != NULL);
     assert(dist != NULL);
@@ -41,7 +41,7 @@ int push(struct pq_t *pq, struct node_t *node, int *dist) {
     return 0;
 }
 
-struct node_t *pop(struct pq_t *pq, int *dist) {
+struct node_t *pop_graph(struct pq_t *pq, int *dist) {
     assert(pq != NULL);
     assert(pq->size > 0);
 
@@ -95,10 +95,10 @@ int dijkstra(int graph[][SIZE], int *visited, int *dist, int size, int s_id, int
     s.prev = -1;
 
     init_pq(&pq, size*size);
-    push(pq, &s, dist);
+    push_graph(pq, &s, dist);
 
     while (!is_empty(pq)) {
-	node = pop(pq, dist);
+	node = pop_graph(pq, dist);
 
 	assert(visited[node->id] == 0); // 
 	visited[node->id] = 1;
@@ -127,7 +127,7 @@ int dijkstra(int graph[][SIZE], int *visited, int *dist, int size, int s_id, int
 		new_node->id = i;
 		new_node->prev = node->id;
 		
-		push(pq, new_node, dist);
+		push_graph(pq, new_node, dist);
 
 		int j;
 		printf("in qp, node_id:dist are ");
@@ -141,35 +141,6 @@ int dijkstra(int graph[][SIZE], int *visited, int *dist, int size, int s_id, int
     }
 
     return -1;
-
-}
-
-
-int **make_graph(char *servers, char *LSAs) {
-  assert(servers != NULL);
-  assert(LSAs != NULL);
-  
-  char **server_array = NULL;
-  
-  server_array = make_server_array(servers);
-  
-
-}
-
-char **make_server_array(char *servers) {
-  assert(servers != NULL);
-
-  FILE *fp = NULL;
-  char *line = NULL;
-
-  if ((fp = fopen(servers, "r")) == NULL) {
-    perror("Error! make_server_array, fopen\n");
-    exit(-1);
-  }
-  
-  line = (char *)calloc(128, sizeof(char));
-  while(fgets(line, ))
-  
 
 }
 
