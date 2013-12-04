@@ -29,7 +29,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   assert(res != NULL);
 
   struct sockaddr_in addr;
-  struct sockaddr_in fake_addr;
+  //struct sockaddr_in fake_addr;
   char *dns_query = NULL;
   char *dns_reply = NULL;
   int sock;
@@ -60,7 +60,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   }
 
   // bind fakeip, global, delcared in mydns.h, defined in proxy.c
-  memset(&fake_addr, 0, sizeof(fake_addr));
+  /*memset(&fake_addr, 0, sizeof(fake_addr));
   fake_addr.sin_family = AF_INET;
   if (inet_aton(fakeip, &fake_addr.sin_addr) == 0) {
     perror("Error! mydns, fake_addr, inet_aton\n");
@@ -73,6 +73,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
     exit(-1);
   }
   dbprintf("mydns: bind to fake ip:%s\n", fakeip);
+  */
 
   // send
   if (sendto(sock, dns_query, query_len, 0, (struct sockaddr *)&addr, sizeof(addr)) != query_len) {
