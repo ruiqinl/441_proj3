@@ -130,8 +130,9 @@ int main(int argc, char *argv[]) {
 	print_list(server_ind_list, printer_int);
 
 	server_ind = do_dijkstra(graph, graph_size, client_ind, server_ind_list);
-	
-	//reply_buf = cnd_geo_dist(query, &reply_len, graph, graph_size);
+
+	//reply_buf = cnd_geo_dist(query, &reply_len, graph, );
+	reply_buf = "15441";
       }
 
       printf("nameserver: send reply of length %d back to proxy\n", reply_len);
