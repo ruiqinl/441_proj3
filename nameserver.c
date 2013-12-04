@@ -100,8 +100,9 @@ int main(int argc, char *argv[]) {
       if (round_robin) {
 	assert(picked_server != NULL);
 
+	next_ip = next_server(serverlist, serverlist_len);
 	reply_buf = cnd_rr(query, picked_server->server, &reply_len);
-	picked_server = picked_server->next;
+	//picked_server = picked_server->next;
 
       } else {
 
@@ -235,6 +236,29 @@ int print_serverlist(struct server_t *list) {
   
   return 0;
 }
+
+uint32_t next_server(struct server_t *list, int list_len) {
+  static int ind = 0;
+
+  assert(list != NULL);
+  assert(ind <= list_len);
+  
+  int count = 0;
+  
+  if (ind == list_len) 
+    ind = 0;
+
+  while (count < ind) {
+    assert(list != NULL);
+    list = list->next;
+    ++count;
+  }
+
+  ++ind;
+
+  return list->server;
+}
+
 
 
 

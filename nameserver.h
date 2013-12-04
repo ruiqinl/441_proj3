@@ -25,5 +25,6 @@ struct server_t *get_serverlist(char *servers, int *list_len);
 //int init_serverlist(struct server_t **list);
 struct server_t *push_server(struct server_t *list, uint32_t server, int *list_len);
 int print_serverlist(struct server_t *list);
+uint32_t next_server(struct server_t *list, int list_len);
 
 #endif
