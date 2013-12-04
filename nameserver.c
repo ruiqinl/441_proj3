@@ -216,7 +216,7 @@ struct list_node_t *get_server_ind(struct server_t *serverlist, struct list_node
   int *ind;
   
   server_p = serverlist;
-  while (server != NULL) {
+  while (server_p != NULL) {
     memset(&addr, 0, sizeof(addr));
     addr.s_addr = server_p->server;
 
@@ -225,6 +225,8 @@ struct list_node_t *get_server_ind(struct server_t *serverlist, struct list_node
     ind = (int *)calloc(1, sizeof(int));
     *ind = list_ind(ip_list, ip, comparor_str);
     push(&list, ind);
+
+    server_p = server_p->next; 
 
     dbprintf("%s_%d, ", ip, *ind);
   }
