@@ -19,11 +19,13 @@ struct server_t {
  */
 char *cnd_rr(struct dns_t *query, uint32_t server_ip, int *reply_len);
 
-char *cnd_geo_dist(struct dns_t *query, int *reply_len);
+char *cnd_geo_dist(struct dns_t *query, int *len, char *servers, char *LSAs);
 
-struct server_t *get_serverlist(char *servers);
-int init_serverlist(struct server_t **list);
-int push_server(struct server_t *list, uint32_t ip);
+struct server_t *get_serverlist(char *servers, int *list_len);
+//int init_serverlist(struct server_t **list);
+struct server_t *push_server(struct server_t *list, uint32_t ip, int *list_len);
 int print_serverlist(struct server_t *list);
+
+uint32_t next_server(struct server_t *list, int list_len);
 
 #endif
