@@ -27,7 +27,7 @@ char *make_dns_query(const char *node, int *query_len) {
   uint16_t RCODE = 0x00;
   uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
 
-  uint16_t QDCOUNT = 0x01;//get_qdcount(node);
+  uint16_t QDCOUNT = get_qdcount(node);
   uint16_t ANCOUNT = 0x00;
   uint16_t NSCOUNT = 0x00;
   uint16_t ARCOUNT = 0x00;
@@ -49,25 +49,25 @@ char *make_dns_query(const char *node, int *query_len) {
 }
 
 
-int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA_n) {
+int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
   assert(dns != NULL);
   
   int offset = 0;
 
-  uint16_t NAME_n = htons(0xC00C);
-  memcpy(dns + offset, &NAME_n, 2);
+  uint16_t NAME = htons(0xC00C);
+  memcpy(dns + offset, &NAME, 2);
   offset += 2;
   
-  uint16_t TYPE_n = htons(0x01);
-  memcpy(dns + offset, &TYPE_n, 2);
+  uint16_t TYPE = htons(0x01);
+  memcpy(dns + offset, &TYPE, 2);
   offset += 2;
   
-  uint16_t CLASS_n = htons(0x01);
-  memcpy(dns + offset, &CLASS_n, 2);
+  uint16_t CLASS = htons(0x01);
+  memcpy(dns + offset, &CLASS, 2);
   offset += 2;
 
-  uint32_t TTL_n = htonl(0x00);
-  memcpy(dns + offset, &TTL_n, 4);
+  uint32_t TTL = htonl(0x00);
+  memcpy(dns + offset, &TTL, 4);
   offset += 4;
 
   uint16_t RDLENGTH_n = htons(RDLENGTH);
@@ -75,7 +75,7 @@ int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA_n) {
   offset += 2;
 
   if (RDLENGTH != 0) {
-    //uint32_t RDATA_n = htonl(RDATA);
+    uint32_t RDATA_n = htonl(RDATA);
     memcpy(dns + offset, &RDATA_n, 4);
     offset += 4;
   } 
@@ -136,11 +136,11 @@ int make_question(char *dns, const char *node) {
   ++offset;
 
   // qtype, qclass
-  uint16_t QTYPE_n = htons(0x01);
-  uint16_t QCLASS_n = htons(0x01);
-  memcpy(dns + offset, &QTYPE_n, 2);
+  uint16_t QTYPE = htons(0x01);
+  uint16_t QCLASS = htons(0x01);
+  memcpy(dns + offset, &QTYPE, 2);
   offset += 2;
-  memcpy(dns + offset, &QCLASS_n, 2);
+  memcpy(dns + offset, &QCLASS, 2);
   offset += 2;
   //dbprintf("make_question: QTYPE:%d QCLASS:%d\n", *(query+offset-4), *(query+offset-2));
 
@@ -210,7 +210,7 @@ struct dns_t *parse_dns(char *dns) {
 
   q->OPCODE = 0x0f << 11;
   q->OPCODE = q->OPCODE & q->flags;
-  q->OPCODE = q->OPCODE >> 11;
+  q->OPCODE = q->OPCODE >> 14;
   
   q->AA = 0x01 << 10;
   q->AA = q->AA & q->flags;
@@ -269,8 +269,7 @@ struct dns_t *parse_dns(char *dns) {
 
   if (q->RDLENGTH != 0) {
     memcpy(&(q->RDATA), p, 4);
-    //q->RDATA = ntohl(q->RDATA);
-    q->RDATA = q->RDATA;
+    q->RDATA = ntohl(q->RDATA);
     p += 4;
   }
 
@@ -322,8 +321,8 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   struct dns_t *reply = NULL;
 
   reply = parse_dns(dns_reply);
-  assert(reply->RDLENGTH == 4);
-  //printf("reply->RDLENGTH:%x\n", reply->RDLENGTH);
+  //assert(reply->RDLENGTH == 4);
+  printf("reply->RDLENGTH:%x\n", reply->RDLENGTH);
   assert(reply->RDATA != 0x00);
   
   printf("parse_dns_reply: recvd ip is %x\n", reply->RDATA);
@@ -343,17 +342,14 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   return (struct sockaddr *)addr;
 }
 
-// @param ip_n It's already in network order
-char *make_dns_reply(struct dns_t *query, uint32_t ip_n, int *reply_len) {
+char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   assert(query != NULL);
   assert(reply_len != NULL);
-  assert(ip_n != 0x00);
+  assert(ip != 0x00);
   
   char *reply = (char *)calloc(BUF_SIZE, sizeof(char));
   int offset = 0;
   char *node = NULL;
-
-  node = recover_node(query->QNAME);
 
   // make head section
   uint16_t QR = 0x01 << (15-0);;
@@ -362,13 +358,7 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip_n, int *reply_len) {
   uint16_t TC = 0x00;
   uint16_t RD = 0x00;
   uint16_t RA = 0x00;
-
   uint16_t RCODE = 0x00;
-  if (strcmp(node, "video.cs.cmu.edu") != 0) { // NODE is declaredake in helper.h
-    printf("make_dns_reply: query for %s != video.cs.cmu.edu, set RCODE to 0x03\n", node);
-    RCODE = 0x03;
-  }
-  
   uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
 
   uint16_t QDCOUNT = 0x00;
@@ -377,11 +367,11 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip_n, int *reply_len) {
   uint16_t ARCOUNT = 0x00;
 
   uint16_t RDLENGTH = 0x04; // 4 bytes
-  uint32_t RDATA_n = ip_n;
+  uint32_t RDATA = ip;
   offset = make_head(reply, query->msg_id, flags, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT);
-
+  node = recover_node(query->QNAME);
   offset += make_question(reply + offset, node); // same as original question
-  offset += make_answer(reply + offset, RDLENGTH, RDATA_n);
+  offset += make_answer(reply + offset, RDLENGTH, RDATA);
   
   // return length
   *reply_len = offset;

@@ -29,20 +29,17 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   assert(res != NULL);
 
   struct sockaddr_in addr;
-  //struct sockaddr_in fake_addr;
   char *dns_query = NULL;
   char *dns_reply = NULL;
   int sock;
   int ret;  
   int query_len;
 
-  struct dns_t * tmp = NULL;
-
   // make query packet
   //dns_query = make_dns_query(node, service);
   dns_query = make_dns_query(node, &query_len);
-  tmp = parse_dns(dns_query); //
-  print_dns(tmp); //
+  struct dns_t *tmp = parse_dns(dns_query);
+  print_dns(tmp);
   
   // udp socket to dns server
   printf("resolve: send query of %d bytes to dns_ip:%s, dns_port:%d\n", query_len, dns_ip, dns_port);
@@ -59,22 +56,6 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
     exit(-1);
   }
 
-  // bind fakeip, global, delcared in mydns.h, defined in proxy.c
-  /*memset(&fake_addr, 0, sizeof(fake_addr));
-  fake_addr.sin_family = AF_INET;
-  if (inet_aton(fakeip, &fake_addr.sin_addr) == 0) {
-    perror("Error! mydns, fake_addr, inet_aton\n");
-    exit(-1);
-  }
-  fake_addr.sin_port = htons(0);
-		    
-  if (bind(sock, (struct sockaddr *)&fake_addr, sizeof(fake_addr)) == -1) {
-    perror("Error! proxy, bind\n");
-    exit(-1);
-  }
-  dbprintf("mydns: bind to fake ip:%s\n", fakeip);
-  */
-
   // send
   if (sendto(sock, dns_query, query_len, 0, (struct sockaddr *)&addr, sizeof(addr)) != query_len) {
     perror("Error! mydns, sendto, maybe use while");
@@ -85,11 +66,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   dns_reply = (char *)calloc(BUF_SIZE, sizeof(char));
 
   ret = recvfrom(sock, dns_reply, BUF_SIZE, 0, NULL, NULL);
-  printf("resolve: recvd %d bytes\n", ret);
-  
-  // 
-  tmp = parse_dns(dns_reply);
-  print_dns(tmp);
+  printf("resolve: recvd %s\n", dns_reply);
 
   if (ret == -1) {
     perror("Error! mydns, recvfrom");
@@ -108,7 +85,6 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
 
 #ifdef TEST
 
-const char *fakeip = "1.0.0.1";
 int main() {
 
   int count = get_qdcount("www.google.com");

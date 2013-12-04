@@ -19,9 +19,8 @@
 
 double avg_tput = 0.0;
 int *all_rates = NULL;
-char *NODE = "video.cs.cmu.edu";
-//char *NODE = "audio.cs.cmu.edu";
-char *SERVICE = "8080";
+char *node = "video.cs.cmu.edu";
+char *service = "8080";
 
 
 const char CRLF[] = "\r\n";

@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 
-#define DBPRINTF 1
+#define DBPRINTF 0
 #define dbprintf(...) do{if(DBPRINTF) fprintf(stdout, __VA_ARGS__); }while(0)
 
 #define MAX_SOCK 1024
@@ -115,8 +115,8 @@ struct req_queue {
 
 extern double avg_tput;
 extern int *all_rates;
-extern char *NODE; // video.cs.cmu.edu
-extern char *SERVICE; // 8080, this is the video server port
+extern char *node; // video.cs.cmu.edu
+extern char *service; // 8080, this is the video server port
 
 struct buf {
 
