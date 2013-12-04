@@ -36,6 +36,12 @@ int main(int argc, char *argv[]) {
   uint32_t next_ip;
   int **graph;
   int graph_size;
+  struct list_node_t *lsa_list = NULL;
+  struct list_node_t *ip_list = NULL;
+
+  int client_ind, server_ind;
+  struct list_node_t *server_ind_list = NULL;
+  
   
   if (strcmp(argv[1], "-r") == 0) {
     round_robin = 1;
@@ -55,10 +61,9 @@ int main(int argc, char *argv[]) {
     servers = argv[4];
     LSAs = argv[5];
 
-    graph = make_graph(LSAs, &graph_size);
+    graph = make_graph(LSAs, &graph_size, &lsa_list, &ip_list);
+    serverlist = get_serverlist(servers, &serverlist_len);
   }
-
-  
 
   // sock
   if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
@@ -111,8 +116,18 @@ int main(int argc, char *argv[]) {
 
       } else {
 	dbprintf("nameserver: geo_dist\n");
+	assert(graph != NULL);
+	assert(graph_size > 0);
+	assert(lsa_list != NULL);
+	assert(ip_list != NULL);
+	assert(serverlist != NULL);
+	
+	client_ind = get_client_ind(&client_addr, ip_list);
+	server_ind_list = get_server_ind(serverlist, ip_list);
 
-	reply_buf = cnd_geo_dist(query, &reply_len, graph, LSAs);
+	server_ind = do_dijkstra(graph, graph_size, client_ind, server_ind_list);
+	
+	//reply_buf = cnd_geo_dist(query, &reply_len, graph, graph_size);
       }
 
       dbprintf("nameserver: send reply back to proxy\n");
@@ -167,6 +182,37 @@ char *cnd_geo_dist(struct dns_t *query, int *len, int **graph, char *server_list
   return reply;
 }
 
+
+int get_client_ind(struct sockaddr_in *client_addr, struct list_node_t *ip_list) {
+  assert(client_addr != NULL);
+  assert(ip_list != NULL);
+
+  char *client_ip = NULL;
+  int client_ind;
+
+  if ((client_ip = inet_ntoa(client_addr->sin_addr)) == NULL) {
+    perror("Error! get_clietn_ind, inet_ntoa");
+    exit(-1);
+  }
+  
+  client_ind = list_ind(ip_list, client_ip, comparor_str);
+  assert(client_ind != -1);
+
+  return client_ind;
+}
+
+struct list_node_t *get_server_ind(struct server_t *serverlist, struct list_node_t *ip_list) {
+  
+  printf("get_server_ind: not imp yet\n");
+  return NULL;
+}
+
+
+uint32_t do_dijkstra(int **graph, int graph_size, int client, struct list_node_t *servers) {
+
+  printf("do_dijk: not imp yet\n");
+  return 0;
+}
 
 uint32_t next_server(struct server_t *list, int list_len) {
   static int ind = 0;
@@ -284,21 +330,20 @@ int **make_graph(char *LSAs, int *graph_size, struct list_node_t **ret_lsa_list,
   struct list_node_t *lsa_list = NULL; //
   struct list_node_t *ip_list = NULL; //
   int **matrix = NULL;
-  int matrix_size;
 
   // get adj_list and ip_list
   get_graph_list(&lsa_list, &ip_list, LSAs);
   *ret_ip_list = ip_list;
   *ret_lsa_list = lsa_list;
 
-  print_list(lsa_list, printer_lsa);
-  print_list(ip_list, printer_str);
+  //print_list(lsa_list, printer_lsa);
+  //print_list(ip_list, printer_str);
   
   // get adj_matrix
-  matrix = get_adj_matrix(lsa_list, ip_list, &matrix_size);
+  matrix = get_adj_matrix(lsa_list, ip_list, graph_size);
 
   
-  return NULL;
+  return matrix;
 
 }
 
@@ -356,13 +401,7 @@ int **get_adj_matrix(struct list_node_t *lsa_list, struct list_node_t *ip_list, 
     set_adj_line(matrix, i, tmp_lsa, ip_list);
   }
 
-  // show matrix
-  for (i = 0; i < size; i++) {
-    for (j = 0; j < size; j++)
-      printf("%2d, ", matrix[i][j]);
-    printf("\n");
-  }
-
+ 
   return matrix;
 }
 
@@ -653,10 +692,22 @@ int main(){
 
 
   // test make_graph
-  int matrix_size;
-  make_graph("./topos/topo1/topo1.lsa", &matrix_size);
+  int size;
+  struct list_node_t *lsa_list = NULL;
+  struct list_node_t *ip_list = NULL;
+  int **matrix = NULL;
 
+  matrix = make_graph("./topos/topo1/topo1.lsa", &size, &lsa_list, &ip_list);
+
+  print_list(lsa_list, printer_lsa);
+  print_list(ip_list, printer_str);
   
+  int i, j;
+  for (i = 0; i < size; i++) {
+    for (j = 0; j < size; j++)
+      printf("%2d, ", matrix[i][j]);
+    printf("\n");
+  }
 
   return 0;
 }

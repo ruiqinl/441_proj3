@@ -48,4 +48,8 @@ int **get_adj_matrix(struct list_node_t *lsa_list, struct list_node_t *ip_list, 
 int comparor_lsa_ip(void *lsa_void, void *ip_void);
 int set_adj_line(int **matrix, int line_ind, struct lsa_t *lsa, struct list_node_t *ip_list);
 
+int get_client_ind(struct sockaddr_in *client_addr, struct list_node_t *ip_list);
+struct list_node_t *get_server_ind(struct server_t *serverlist, struct list_node_t *ip_list);
+uint32_t do_dijkstra(int **graph, int graph_size, int client_ind, struct list_node_t *server_ind_list);
+
 #endif
