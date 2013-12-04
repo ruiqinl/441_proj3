@@ -43,8 +43,8 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   // make query packet
   //dns_query = make_dns_query(node, service);
   dns_query = make_dns_query(node, &query_len);
-  tmp = parse_dns(dns_query);
-  print_dns(tmp);
+  tmp = parse_dns(dns_query); //
+  print_dns(tmp); //
   
   // udp socket to dns server
   printf("resolve: send query of %d bytes to dns_ip:%s, dns_port:%d\n", query_len, dns_ip, dns_port);

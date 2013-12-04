@@ -27,7 +27,7 @@ char *make_dns_query(const char *node, int *query_len) {
   uint16_t RCODE = 0x00;
   uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
 
-  uint16_t QDCOUNT = get_qdcount(node);
+  uint16_t QDCOUNT = 0x01;//get_qdcount(node);
   uint16_t ANCOUNT = 0x00;
   uint16_t NSCOUNT = 0x00;
   uint16_t ARCOUNT = 0x00;
@@ -54,20 +54,20 @@ int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
   
   int offset = 0;
 
-  uint16_t NAME = htons(0xC00C);
-  memcpy(dns + offset, &NAME, 2);
+  uint16_t NAME_n = htons(0xC00C);
+  memcpy(dns + offset, &NAME_n, 2);
   offset += 2;
   
-  uint16_t TYPE = htons(0x01);
-  memcpy(dns + offset, &TYPE, 2);
+  uint16_t TYPE_n = htons(0x01);
+  memcpy(dns + offset, &TYPE_n, 2);
   offset += 2;
   
-  uint16_t CLASS = htons(0x01);
-  memcpy(dns + offset, &CLASS, 2);
+  uint16_t CLASS_n = htons(0x01);
+  memcpy(dns + offset, &CLASS_n, 2);
   offset += 2;
 
-  uint32_t TTL = htonl(0x00);
-  memcpy(dns + offset, &TTL, 4);
+  uint32_t TTL_n = htonl(0x00);
+  memcpy(dns + offset, &TTL_n, 4);
   offset += 4;
 
   uint16_t RDLENGTH_n = htons(RDLENGTH);
@@ -136,11 +136,11 @@ int make_question(char *dns, const char *node) {
   ++offset;
 
   // qtype, qclass
-  uint16_t QTYPE = htons(0x01);
-  uint16_t QCLASS = htons(0x01);
-  memcpy(dns + offset, &QTYPE, 2);
+  uint16_t QTYPE_n = htons(0x01);
+  uint16_t QCLASS_n = htons(0x01);
+  memcpy(dns + offset, &QTYPE_n, 2);
   offset += 2;
-  memcpy(dns + offset, &QCLASS, 2);
+  memcpy(dns + offset, &QCLASS_n, 2);
   offset += 2;
   //dbprintf("make_question: QTYPE:%d QCLASS:%d\n", *(query+offset-4), *(query+offset-2));
 
@@ -210,7 +210,7 @@ struct dns_t *parse_dns(char *dns) {
 
   q->OPCODE = 0x0f << 11;
   q->OPCODE = q->OPCODE & q->flags;
-  q->OPCODE = q->OPCODE >> 14;
+  q->OPCODE = q->OPCODE >> 11;
   
   q->AA = 0x01 << 10;
   q->AA = q->AA & q->flags;
