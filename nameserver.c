@@ -205,11 +205,33 @@ int get_client_ind(struct sockaddr_in *client_addr, struct list_node_t *ip_list)
 }
 
 struct list_node_t *get_server_ind(struct server_t *serverlist, struct list_node_t *ip_list) {
+  assert(serverlist != NULL);
+  assert(ip_list != NULL);
+  dbprintf("ger_server_ind:\n");
   
-  printf("get_server_ind: not imp yet\n");
-  return NULL;
-}
+  struct server_t *server_p = NULL;
+  char *ip = NULL;
+  struct in_addr addr;  
+  struct list_node_t *list = NULL;
+  int *ind;
+  
+  server_p = serverlist;
+  while (server != NULL) {
+    memset(&addr, 0, sizeof(addr));
+    addr.s_addr = server_p->server;
 
+    ip = inet_ntoa(addr);
+    
+    ind = (int *)calloc(1, sizeof(int));
+    *ind = list_ind(ip_list, ip, comparor_str);
+    push(&list, ind);
+
+    dbprintf("%s_%d, ", ip, *ind);
+  }
+  printf("\n");
+ 
+  return list;
+}
 
 uint32_t do_dijkstra(int **graph, int graph_size, int client, struct list_node_t *servers) {
 
