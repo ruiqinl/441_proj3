@@ -150,6 +150,20 @@ struct list_node_t *list_node(struct list_node_t *list, int ind) {
   
 }
 
+int list_size(struct list_node_t *list) {
+  
+  int count = 0;
+
+  if (list == NULL)
+    return count;
+
+  while (list != NULL) {
+    list = list->next;
+    ++count;
+  }
+
+  return count;
+}
 
 #ifdef TEST
 
@@ -158,18 +172,23 @@ int main(){
   
   //init_list(&list);
   print_list(list, printer_str);
+  printf("size:%d\n", list_size(list));
 
   push(&list, "ab");
   print_list(list, printer_str);
-  
+  printf("size:%d\n", list_size(list));
+
   push(&list, "cd");
   print_list(list, printer_str);
-
+  printf("size:%d\n", list_size(list));
+ 
   push(&list, "efg");
   print_list(list, printer_str);
-
+  printf("size:%d\n", list_size(list));
+ 
   //test list_ind
   printf("ab:%d, cd:%d, efg:%d, xyz:%d\n", list_ind(list, "ab", comparor_str), list_ind(list, "cd", comparor_str), list_ind(list, "efg", comparor_str), list_ind(list, "xyz", comparor_str));
+  printf("size:%d\n", list_size(list));
 
   // test replace
   struct list_node_t *tmp = list_node(list, 0);
@@ -186,16 +205,20 @@ int main(){
   struct list_node_t *p = pop(&list);
   printf("pop:%s\n", (char *)(p->data));
   print_list(list, printer_str);
+  printf("size:%d\n", list_size(list));
+ 
+  p = pop(&list);
+  printf("pop:%s\n", (char *)(p->data));
+  print_list(list, printer_str);
+  printf("size:%d\n", list_size(list));
 
   p = pop(&list);
   printf("pop:%s\n", (char *)(p->data));
   print_list(list, printer_str);
+  printf("size:%d\n", list_size(list));
 
-  p = pop(&list);
-  printf("pop:%s\n", (char *)(p->data));
-  print_list(list, printer_str);
 
-  
+  return 0;
 }
 
 #endif

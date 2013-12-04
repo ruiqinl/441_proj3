@@ -35,10 +35,17 @@ int print_serverlist(struct server_t *list);
 
 uint32_t next_server(struct server_t *list, int list_len);
 
-int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size);
+int **make_graph(char *LSAs, int *graph_size, struct list_node_t **ret_lsa_list, struct list_node_t **ret_ip_list);
 struct lsa_t *parse_line(char *line);
 void printer_lsa(void *data);
 int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa);
 int comparor_lsa(void *lsa1, void *lsa2);
+
+int get_graph_list(struct list_node_t **ret_nei_list, struct list_node_t **ret_ip_list, char *LSAs);
+
+int **get_adj_matrix(struct list_node_t *lsa_list, struct list_node_t *ip_list, int *list_size);
+
+int comparor_lsa_ip(void *lsa_void, void *ip_void);
+int set_adj_line(int **matrix, int line_ind, struct lsa_t *lsa, struct list_node_t *ip_list);
 
 #endif

@@ -55,8 +55,7 @@ int main(int argc, char *argv[]) {
     servers = argv[4];
     LSAs = argv[5];
 
-    serverlist = get_serverlist(servers, &serverlist_len);
-    graph = make_graph(serverlist, LSAs, &graph_size);
+    graph = make_graph(LSAs, &graph_size);
   }
 
   
@@ -79,7 +78,6 @@ int main(int argc, char *argv[]) {
     perror("nameserver: bind\n");
     exit(-1);
   }
-  
   
 
   // recvfrom
@@ -105,12 +103,14 @@ int main(int argc, char *argv[]) {
       print_dns(query);
       
       if (round_robin) {
+	dbprintf("nameserver: round_rodin\n");
+	assert(serverlist != NULL);
 
 	next_ip = next_server(serverlist, serverlist_len);
 	reply_buf = cnd_rr(query, next_ip, &reply_len);
 
-
       } else {
+	dbprintf("nameserver: geo_dist\n");
 
 	reply_buf = cnd_geo_dist(query, &reply_len, graph, LSAs);
       }
@@ -150,6 +150,8 @@ char *cnd_geo_dist(struct dns_t *query, int *len, int **graph, char *server_list
   
   char *reply = NULL;
   //int server_ind;
+  
+  
 
   // figout out ip
   //server_ind = dijkstra(graph);
@@ -164,18 +166,6 @@ char *cnd_geo_dist(struct dns_t *query, int *len, int **graph, char *server_list
 
   return reply;
 }
-
-/*
-int init_serverlist(struct server_t **list) {
-  assert(list != NULL);
-
-  *list = (struct server_t *)calloc(1, sizeof(struct server_t));
-
-  (*list)->server = 0x00;
-  (*list)->next = *list;
-  
-  return 0;
-  }*/
 
 
 uint32_t next_server(struct server_t *list, int list_len) {
@@ -285,24 +275,158 @@ int print_serverlist(struct server_t *list) {
 }
 
 
-int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
-  //assert(server_list != NULL);
+int **make_graph(char *LSAs, int *graph_size, struct list_node_t **ret_lsa_list, struct list_node_t **ret_ip_list) {
   assert(LSAs != NULL);
-  //assert(graph_size != NULL);
+  assert(graph_size != NULL);
+  assert(ret_lsa_list != NULL);
+  assert(ret_ip_list != NULL);
   
+  struct list_node_t *lsa_list = NULL; //
+  struct list_node_t *ip_list = NULL; //
+  int **matrix = NULL;
+  int matrix_size;
+
+  // get adj_list and ip_list
+  get_graph_list(&lsa_list, &ip_list, LSAs);
+  *ret_ip_list = ip_list;
+  *ret_lsa_list = lsa_list;
+
+  print_list(lsa_list, printer_lsa);
+  print_list(ip_list, printer_str);
+  
+  // get adj_matrix
+  matrix = get_adj_matrix(lsa_list, ip_list, &matrix_size);
+
+  
+  return NULL;
+
+}
+
+int **get_adj_matrix(struct list_node_t *lsa_list, struct list_node_t *ip_list, int *matrix_size) {
+  assert(lsa_list != NULL);
+  assert(ip_list != NULL);
+  assert(list_size != NULL);
+  printf("get_adj_matrix:\n");
+
+  int size;
+  int **matrix = NULL;
+  int i, j;
+  struct list_node_t *tmp_node = NULL;
+  char *tmp_ip = NULL;
+  struct lsa_t *tmp_lsa = NULL;
+  int ind;
+
+  // size
+  size = list_size(ip_list);
+  *matrix_size = size;
+
+  // calloc space, and init to -1 which indicating no edge
+  matrix = (int **)calloc(size, sizeof(int *));
+
+  for (i = 0; i < size; i++) {
+    matrix[i] = (int *)calloc(size, sizeof(int));
+    
+    for (j = 0; j < size; j++) {
+      if (i != j)
+	matrix[i][j] = -1;
+      else 
+	matrix[i][j] = 0; // diag line is 0 line
+    }
+  }
+
+  // fill in matrix, each ip is natually assigned index in the ip_list as id
+  for (i = 0; i < size; i++) {
+
+    // find lsa with index i
+    tmp_node = list_node(ip_list, i);
+    tmp_ip = (char *)(tmp_node->data);
+    //dbprintf("%s with ind_%d\n", tmp_ip, i);
+
+    ind = list_ind(lsa_list, tmp_ip, comparor_lsa_ip);
+    if (ind == -1) {
+      printf("Warning! %s_%d does not exist in nei_list\n", tmp_ip, i);
+      continue;
+    }
+    tmp_node = list_node(lsa_list, ind);
+    tmp_lsa = (struct lsa_t *)(tmp_node->data);
+    //dbprintf("with lsa:");
+    //printer_lsa(tmp_lsa);
+
+    // modify adj_matrix
+    set_adj_line(matrix, i, tmp_lsa, ip_list);
+  }
+
+  // show matrix
+  for (i = 0; i < size; i++) {
+    for (j = 0; j < size; j++)
+      printf("%2d, ", matrix[i][j]);
+    printf("\n");
+  }
+
+  return matrix;
+}
+
+
+int set_adj_line(int **matrix, int line_ind, struct lsa_t *lsa, struct list_node_t *ip_list) {
+  assert(matrix != NULL);
+  assert(lsa != NULL);
+  assert(ip_list != NULL);
+
+  struct list_node_t *nei = NULL;
+  char *nei_ip = NULL;
+  int nei_ind;
+  
+  nei = lsa->neighbors;
+
+  while (nei != NULL) {
+    nei_ip = (char *)nei->data;
+    nei_ind = list_ind(ip_list, nei_ip, comparor_str);
+    assert(nei_ind != -1);
+
+    matrix[line_ind][nei_ind] = 1;
+
+    //dbprintf("matrix[%d][%d] = 1, ", line_ind, nei_ind);
+    
+    nei = nei->next;
+  }
+  //dbprintf("\n");
+
+  return 0;
+}
+
+
+int comparor_lsa_ip(void *lsa_void, void *ip_void) {
+  assert(lsa_void != NULL);
+  assert(ip_void != NULL);
+
+  struct lsa_t *lsa = (struct lsa_t *)lsa_void;
+  char *ip = (char *)ip_void;
+
+  return strcmp(lsa->ip, ip);
+
+}
+
+
+int get_graph_list(struct list_node_t **ret_nei_list, struct list_node_t **ret_ip_list, char *LSAs) {
+
+  assert(LSAs != NULL);
+  assert(ret_nei_list != NULL);
+  assert(ret_ip_list != NULL);
+
   FILE *fp = NULL;
   int line_size = 1024;
   char line[line_size];
   struct lsa_t *lsa = NULL;
-  struct list_node_t *lsa_list = NULL;
-  struct list_node_t *ip_list = NULL;
+  struct list_node_t *lsa_list = NULL; //
+  struct list_node_t *ip_list = NULL; //
   int ind;
   struct list_node_t *tmp_node = NULL;
   struct lsa_t *tmp_lsa = NULL;
 
   //init_list(&lsa_list);
 
-  // get host list first
+
+  // get neighbor list and ip list first
   if((fp = fopen(LSAs, "r")) == NULL) {
     perror("Error! make_graph, fopen");
     exit(-1);
@@ -311,8 +435,12 @@ int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
   memset(line, 0, line_size);
   while (fgets(line, line_size, fp) != NULL) {
     lsa = parse_line(line);
-    
     //dbprinter_lsa(lsa);//
+
+    // ip_list
+    collect_ip(&ip_list, lsa);
+
+    // lsa_list
     if ((ind = list_ind(lsa_list, lsa, comparor_lsa)) != -1) {
       //dbprintf("already exist at %d", ind);// 
       tmp_node = list_node(lsa_list, ind);
@@ -327,21 +455,18 @@ int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
 
     } else {
       push(&lsa_list, lsa);
-      collect_ip(&ip_list, lsa);
-    }    
+    }     
     
     memset(line, 0, line_size);
   }
 
-  print_list(lsa_list, printer_lsa);
+  //print_list(lsa_list, printer_lsa);
 
-  // to ind list
-  
-  
-  // generate graph
-  
-  return NULL;
-
+  // ret lists
+  *ret_nei_list = lsa_list;
+  *ret_ip_list = ip_list;
+ 
+  return 0;
 }
 
 int comparor_lsa(void *lsa1, void *lsa2) {
@@ -441,7 +566,7 @@ void printer_lsa(void *data) {
 int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa) {
   assert(ip_list != NULL);
   assert(lsa != NULL);
-  dbprintf("collect_ip:\n");
+  //dbprintf("collect_ip:\n");
   
   char *ip = NULL;
   struct list_node_t *neighbor = NULL;
@@ -454,7 +579,7 @@ int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa) {
     memcpy(ip, lsa->ip, strlen(lsa->ip));
     push(ip_list, ip);
 
-    print_list(*ip_list, printer_str);//
+    //print_list(*ip_list, printer_str);//
   }
 
   // neighbor list part
@@ -475,7 +600,7 @@ int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa) {
 
     neighbor = neighbor->next;
 
-    print_list(*ip_list, printer_str);//
+    //print_list(*ip_list, printer_str);//
   }
   
   return 0;
@@ -516,8 +641,22 @@ int main(){
   //struct lsa_t *lsa = parse_line("router2 6 3.0.0.1,4.0.0.1,5.0.0.1,router1\n\n\n");
   //printer_lsa(lsa);
 
+  //test get_graph_list
+  
+  //struct list_node_t *lsa_list = NULL; //
+  //struct list_node_t *ip_list = NULL; //
+
+  //get_graph_list(&lsa_list, &ip_list, "./topos/topo2/topo2.lsa");
+
+  //print_list(lsa_list, printer_lsa);
+  //print_list(ip_list, printer_str);
+
+
   // test make_graph
-  make_graph(NULL, "./topos/topo1/topo1.lsa", NULL);
+  int matrix_size;
+  make_graph("./topos/topo1/topo1.lsa", &matrix_size);
+
+  
 
   return 0;
 }

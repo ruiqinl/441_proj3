@@ -20,5 +20,7 @@ struct list_node_t *list_node(struct list_node_t *list, int ind);
 int comparor_str(void *s, void *t);
 int comparor_int(void *a, void *b);
 
+int list_size(struct list_node_t *list);
+
 
 #endif
