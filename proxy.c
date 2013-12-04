@@ -22,6 +22,8 @@ char *node = "video.cs.cmu.edu";
 char *service = "8080";
 */
 
+const char *fakeip = NULL;
+
 int main(int argc, char *argv[]){
 
     int listen_sock;
@@ -74,6 +76,9 @@ int main(int argc, char *argv[]){
     else 
       www_ip = NULL;
 
+    //
+    fakeip = fake_ip;// global, decalred in mydns.h
+
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -115,7 +120,7 @@ int main(int argc, char *argv[]){
       // cp2
       printf("proxy: init_mydns, and resolve\n");
 
-      init_mydns(dns_ip, dns_port, fake_ip);
+      init_mydns(dns_ip, dns_port);
       resolve(NODE, SERVICE, NULL, &res); // service is 8080
       server_addr = *(struct sockaddr_in *)(res->ai_addr);
       

@@ -12,15 +12,13 @@
 
 static const char *dns_ip = NULL;
 static unsigned int dns_port = 0;
-static const char *dns_fakeip = NULL;
 
-int init_mydns(const char *ip, unsigned int port, char *fakeip) {
+int init_mydns(const char *ip, unsigned int port) {
   assert(ip != NULL);
   assert(port > 0);
 
   dns_ip = ip;
   dns_port = port;
-  dns_fakeip = fakeip;
 
   return 0;
 }
@@ -61,10 +59,10 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
     exit(-1);
   }
 
-  // bind fakeip
+  // bind fakeip, global, delcared in mydns.h, defined in proxy.c
   memset(&fake_addr, 0, sizeof(fake_addr));
   fake_addr.sin_family = AF_INET;
-  if (inet_aton(dns_fakeip, &fake_addr.sin_addr) == 0) {
+  if (inet_aton(fakeip, &fake_addr.sin_addr) == 0) {
     perror("Error! mydns, fake_addr, inet_aton\n");
     exit(-1);
   }
@@ -74,7 +72,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
     perror("Error! proxy, bind\n");
     exit(-1);
   }
-  dbprintf("mydns: bind to fake ip:%s\n", dns_fakeip);
+  dbprintf("mydns: bind to fake ip:%s\n", fakeip);
 
   // send
   if (sendto(sock, dns_query, query_len, 0, (struct sockaddr *)&addr, sizeof(addr)) != query_len) {
@@ -109,6 +107,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
 
 #ifdef TEST
 
+const char *fakeip = "1.0.0.1";
 int main() {
 
   int count = get_qdcount("www.google.com");

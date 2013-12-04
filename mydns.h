@@ -3,6 +3,8 @@
 
 #include <netdb.h>
 
+extern const char *fakeip;
+
 /**
  * Initialize your client DNS library with the IP address and port number of
  * your DNS server.
@@ -12,7 +14,7 @@
  *
  * @return 0 on success, -1 otherwise
  */
-int init_mydns(const char *dns_ip, unsigned int dns_port, char *fakeip);
+int init_mydns(const char *dns_ip, unsigned int dns_port);
 
 
 /**
