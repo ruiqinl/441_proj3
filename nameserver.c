@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 	server_ind_list = get_server_ind(serverlist, ip_list);
 	printf("get_client_ind:%s, %d\n", client_ip, client_ind);
 	printf("server_ind_list:");
-	print_list(server_ind_list, printer_ind);
+	print_list(server_ind_list, printer_int);
 
 	server_ind = do_dijkstra(graph, graph_size, client_ind, server_ind_list);
 	
