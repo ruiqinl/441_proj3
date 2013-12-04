@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
   static struct server_t *picked_server = NULL;
   int reply_len = 0;
   int serverlist_len;
+  uint32_t next_ip;
   
   if (strcmp(argv[1], "-r") == 0) {
     round_robin = 1;
@@ -101,7 +102,7 @@ int main(int argc, char *argv[]) {
 	assert(picked_server != NULL);
 
 	next_ip = next_server(serverlist, serverlist_len);
-	reply_buf = cnd_rr(query, picked_server->server, &reply_len);
+	reply_buf = cnd_rr(query, next_ip, &reply_len);
 	//picked_server = picked_server->next;
 
       } else {
