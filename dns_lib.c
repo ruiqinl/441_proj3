@@ -75,7 +75,8 @@ int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
   offset += 2;
 
   if (RDLENGTH != 0) {
-    uint32_t RDATA_n = htonl(RDATA);
+    //uint32_t RDATA_n = htonl(RDATA);
+    uint32_t RDATA_n = RDATA;
     memcpy(dns + offset, &RDATA_n, 4);
     offset += 4;
   } 
@@ -269,7 +270,8 @@ struct dns_t *parse_dns(char *dns) {
 
   if (q->RDLENGTH != 0) {
     memcpy(&(q->RDATA), p, 4);
-    q->RDATA = ntohl(q->RDATA);
+    //q->RDATA = ntohl(q->RDATA);
+    q->RDATA = q->RDATA;
     p += 4;
   }
 
