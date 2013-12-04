@@ -112,6 +112,7 @@ int main(int argc, char *argv[]) {
 	dbprintf("nameserver: round_rodin\n");
 	assert(serverlist != NULL);
 
+	// next_ip is already in network order
 	next_ip = next_server(serverlist, serverlist_len);
 	reply_buf = cnd_rr(query, next_ip, &reply_len);
 
@@ -150,14 +151,15 @@ int main(int argc, char *argv[]) {
 
 #endif //TEST
 
-char *cnd_rr(struct dns_t *query, uint32_t ip, int *len) {
+// @param ip It is alreay in network order
+char *cnd_rr(struct dns_t *query, uint32_t ip_n, int *len) {
   assert(query != NULL);
-  assert(ip != 0x00);
+  assert(ip_n != 0x00);
 
   char *reply = NULL;
   
-  reply = make_dns_reply(query, ip, len);
-  dbprintf("cnd_rr: choose ip %x\n", ip);
+  reply = make_dns_reply(query, ip_n, len);
+  dbprintf("cnd_rr: choose ip %x\n", ip_n);
 
   return reply;
 }
@@ -264,6 +266,7 @@ uint32_t next_server(struct server_t *list, int list_len) {
   return list->server;
 }
 
+// return uint32_t ip in network order
 struct server_t *get_serverlist(char *servers, int *list_len) {
   assert(servers != NULL);
   assert(list_len != NULL);

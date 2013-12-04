@@ -49,7 +49,7 @@ char *make_dns_query(const char *node, int *query_len) {
 }
 
 
-int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
+int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA_n) {
   assert(dns != NULL);
   
   int offset = 0;
@@ -75,7 +75,7 @@ int make_answer(char *dns, uint16_t RDLENGTH, uint32_t RDATA) {
   offset += 2;
 
   if (RDLENGTH != 0) {
-    uint32_t RDATA_n = htonl(RDATA);
+    //uint32_t RDATA_n = htonl(RDATA);
     memcpy(dns + offset, &RDATA_n, 4);
     offset += 4;
   } 
@@ -342,10 +342,11 @@ struct sockaddr *parse_dns_reply(char *dns_reply) {
   return (struct sockaddr *)addr;
 }
 
-char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
+// @param ip_n It's already in network order
+char *make_dns_reply(struct dns_t *query, uint32_t ip_n, int *reply_len) {
   assert(query != NULL);
   assert(reply_len != NULL);
-  assert(ip != 0x00);
+  assert(ip_n != 0x00);
   
   char *reply = (char *)calloc(BUF_SIZE, sizeof(char));
   int offset = 0;
@@ -375,11 +376,11 @@ char *make_dns_reply(struct dns_t *query, uint32_t ip, int *reply_len) {
   uint16_t ARCOUNT = 0x00;
 
   uint16_t RDLENGTH = 0x04; // 4 bytes
-  uint32_t RDATA = ip;
+  uint32_t RDATA_n = ip_n;
   offset = make_head(reply, query->msg_id, flags, QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT);
 
   offset += make_question(reply + offset, node); // same as original question
-  offset += make_answer(reply + offset, RDLENGTH, RDATA);
+  offset += make_answer(reply + offset, RDLENGTH, RDATA_n);
   
   // return length
   *reply_len = offset;

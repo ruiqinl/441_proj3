@@ -58,4 +58,4 @@ list_test: list.c
 
 #
 clean:
-	rm -rf $(OBJS_proxy) $(OBJS_nameserver) $(BINS) $(BINS_TEST) *.dSYM *.~
+	rm -rf $(OBJS_proxy) $(OBJS_nameserver) $(BINS) $(BINS_TEST) *.dSYM *~
