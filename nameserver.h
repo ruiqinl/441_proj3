@@ -39,5 +39,6 @@ int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size);
 struct lsa_t *parse_line(char *line);
 void printer_lsa(void *data);
 int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa);
+int comparor_lsa(void *lsa1, void *lsa2);
 
 #endif

@@ -296,6 +296,9 @@ int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
   struct lsa_t *lsa = NULL;
   struct list_node_t *lsa_list = NULL;
   struct list_node_t *ip_list = NULL;
+  int ind;
+  struct list_node_t *tmp_node = NULL;
+  struct lsa_t *tmp_lsa = NULL;
 
   //init_list(&lsa_list);
 
@@ -308,9 +311,24 @@ int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
   memset(line, 0, line_size);
   while (fgets(line, line_size, fp) != NULL) {
     lsa = parse_line(line);
-    push(&lsa_list, lsa);
-  
-    collect_ip(&ip_list, lsa);
+    
+    //dbprinter_lsa(lsa);//
+    if ((ind = list_ind(lsa_list, lsa, comparor_lsa)) != -1) {
+      //dbprintf("already exist at %d", ind);// 
+      tmp_node = list_node(lsa_list, ind);
+      tmp_lsa = (struct lsa_t *)(tmp_node->data);
+      
+      //dbprintf("compare with old lsa\n");//
+      //printer_lsa(tmp_lsa);
+      
+      //dbprintf("new %d ? old %d\n", tmp_lsa->seq_num, lsa->seq_num);
+      if (tmp_lsa->seq_num < lsa->seq_num)
+	tmp_node->data = lsa;
+
+    } else {
+      push(&lsa_list, lsa);
+      collect_ip(&ip_list, lsa);
+    }    
     
     memset(line, 0, line_size);
   }
@@ -324,6 +342,16 @@ int **make_graph(struct server_t *server_list, char *LSAs, int *graph_size) {
   
   return NULL;
 
+}
+
+int comparor_lsa(void *lsa1, void *lsa2) {
+  assert(lsa1 != NULL);
+  assert(lsa2 != NULL);
+  
+  struct lsa_t *a = (struct lsa_t *)lsa1;
+  struct lsa_t *b = (struct lsa_t *)lsa2;
+
+  return strcmp(a->ip, b->ip);
 }
 
 char *make_server_list(char *servers) {
@@ -425,7 +453,8 @@ int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa) {
     ip = (char *)calloc(strlen(lsa->ip)+1, sizeof(char));
     memcpy(ip, lsa->ip, strlen(lsa->ip));
     push(ip_list, ip);
-    print_list(*ip_list, printer_str);
+
+    print_list(*ip_list, printer_str);//
   }
 
   // neighbor list part
@@ -442,10 +471,11 @@ int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa) {
     ip = (char *)calloc(strlen(str)+1, sizeof(char));
     memcpy(ip, str, strlen(str));
 
-    push(ip_list, ip);
-    //print_list(*ip_list, printer_str);
+    push(ip_list, ip);    
 
     neighbor = neighbor->next;
+
+    print_list(*ip_list, printer_str);//
   }
   
   return 0;

@@ -135,6 +135,20 @@ int list_ind(struct list_node_t *list, void *data, int (*comparor)(void *d1, voi
   return ind;
 }
 
+struct list_node_t *list_node(struct list_node_t *list, int ind) {
+  assert(list != NULL);
+  assert(ind >= 0);
+
+  int count = 0;
+  while (count < ind) {
+    assert(list != NULL); // ?? seg fault here if over the end ??
+    list = list->next;
+    ++count;
+  }
+
+  return list;
+  
+}
 
 
 #ifdef TEST
@@ -156,7 +170,18 @@ int main(){
 
   //test list_ind
   printf("ab:%d, cd:%d, efg:%d, xyz:%d\n", list_ind(list, "ab", comparor_str), list_ind(list, "cd", comparor_str), list_ind(list, "efg", comparor_str), list_ind(list, "xyz", comparor_str));
+
+  // test replace
+  struct list_node_t *tmp = list_node(list, 0);
+  tmp->data = "new0";
+
+  tmp = list_node(list, 2);
+  tmp->data = "new2";
   
+  //tmp = list_node(list, 3); // ??? seg fault ???
+
+  print_list(list, printer_str);
+
   // test pop
   struct list_node_t *p = pop(&list);
   printf("pop:%s\n", (char *)(p->data));
