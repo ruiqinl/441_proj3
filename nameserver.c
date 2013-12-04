@@ -352,7 +352,7 @@ int **make_graph(char *LSAs, int *graph_size, struct list_node_t **ret_lsa_list,
 int **get_adj_matrix(struct list_node_t *lsa_list, struct list_node_t *ip_list, int *matrix_size) {
   assert(lsa_list != NULL);
   assert(ip_list != NULL);
-  assert(list_size != NULL);
+  assert(matrix_size != 0);
   printf("get_adj_matrix:\n");
 
   int size;
