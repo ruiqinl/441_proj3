@@ -12,13 +12,15 @@
 
 static const char *dns_ip = NULL;
 static unsigned int dns_port = 0;
+static const char *dns_fakeip = NULL;
 
-int init_mydns(const char *ip, unsigned int port) {
+int init_mydns(const char *ip, unsigned int port, char *fakeip) {
   assert(ip != NULL);
   assert(port > 0);
 
   dns_ip = ip;
   dns_port = port;
+  dns_fakeip = fakeip;
 
   return 0;
 }
@@ -29,6 +31,7 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
   assert(res != NULL);
 
   struct sockaddr_in addr;
+  struct sockaddr_in fake_addr;
   char *dns_query = NULL;
   char *dns_reply = NULL;
   int sock;
@@ -57,6 +60,21 @@ int resolve(const char *node, const char *service, const struct addrinfo *hints,
     perror("Error! mydns, socket");
     exit(-1);
   }
+
+  // bind fakeip
+  memset(&fake_addr, 0, sizeof(fake_addr));
+  fake_addr.sin_family = AF_INET;
+  if (inet_aton(dns_fakeip, &fake_addr.sin_addr) == 0) {
+    perror("Error! mydns, fake_addr, inet_aton\n");
+    exit(-1);
+  }
+  fake_addr.sin_port = htons(0);
+		    
+  if (bind(sock, (struct sockaddr *)&fake_addr, sizeof(fake_addr)) == -1) {
+    perror("Error! proxy, bind\n");
+    exit(-1);
+  }
+  dbprintf("mydns: bind to fake ip:%s\n", dns_fakeip);
 
   // send
   if (sendto(sock, dns_query, query_len, 0, (struct sockaddr *)&addr, sizeof(addr)) != query_len) {
