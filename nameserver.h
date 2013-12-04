@@ -36,6 +36,7 @@ int print_serverlist(struct server_t *list);
 uint32_t next_server(struct server_t *list, int list_len);
 
 int **make_graph(char *LSAs, int *graph_size, struct list_node_t **ret_lsa_list, struct list_node_t **ret_ip_list);
+
 struct lsa_t *parse_line(char *line);
 void printer_lsa(void *data);
 int collect_ip(struct list_node_t **ip_list, struct lsa_t *lsa);

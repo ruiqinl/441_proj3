@@ -198,6 +198,8 @@ int get_client_ind(struct sockaddr_in *client_addr, struct list_node_t *ip_list)
   client_ind = list_ind(ip_list, client_ip, comparor_str);
   assert(client_ind != -1);
 
+  printf("get_client_ind:%s, %d\n", client_ip, client_ind);
+
   return client_ind;
 }
 
