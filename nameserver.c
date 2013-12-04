@@ -270,7 +270,7 @@ int main(){
   printf("\n");
 
   printf("test get_serverlist:\n");
-  get_serverlist("./topos/topo1/topo1.servers");
+  get_serverlist("./topos/topo2/topo2.servers");
 
   return 0;
 }
