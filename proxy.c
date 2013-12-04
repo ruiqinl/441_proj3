@@ -22,7 +22,7 @@ char *node = "video.cs.cmu.edu";
 char *service = "8080";
 */
 
-const char *fakeip = NULL;
+//const char *fakeip = NULL;
 
 int main(int argc, char *argv[]){
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
       www_ip = NULL;
 
     //
-    fakeip = fake_ip;// global, decalred in mydns.h
+    //fakeip = fake_ip;// global, decalred in mydns.h
 
     // browser side of proxy
     listen_sock = socket(AF_INET, SOCK_STREAM, 0);
