@@ -134,7 +134,8 @@ int main(int argc, char *argv[]) {
 	//reply_buf = cnd_geo_dist(query, &reply_len, graph, graph_size);
       }
 
-      dbprintf("nameserver: send reply back to proxy\n");
+      printf("nameserver: send reply of length %d back to proxy\n", reply_len);
+      fflush(stdout);
       assert(reply_len != 0);
       if ((send_ret = sendto(sock, reply_buf, reply_len, 0, (struct sockaddr *)&client_addr, client_len)) != reply_len) {
 	perror("Error! nameserver, sendto\n");
