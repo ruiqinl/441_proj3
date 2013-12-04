@@ -27,7 +27,7 @@ char *make_dns_query(const char *node, int *query_len) {
   uint16_t RCODE = 0x00;
   uint16_t flags = QR | OPCODE | AA | TC | RD | RA | RCODE;
 
-  uint16_t QDCOUNT = get_qdcount(node);
+  uint16_t QDCOUNT = 0x01; //get_qdcount(node);
   uint16_t ANCOUNT = 0x00;
   uint16_t NSCOUNT = 0x00;
   uint16_t ARCOUNT = 0x00;
